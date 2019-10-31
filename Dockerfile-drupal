@@ -1,0 +1,73 @@
+FROM drupal:8-apache
+
+ENV DRUSH_LAUNCHER_VER="0.6.0" \
+    DRUPAL_CONSOLE_LAUNCHER_VER="1.9.3"
+
+RUN apt-get update; \
+	apt-get install -y net-tools \
+            git \
+            unzip \
+            wget \
+            mariadb-client \
+            libphp-predis
+
+# Install composer, drush launcher, drush extensions, drupal console
+RUN set -ex && \
+    cd ~ && \
+    curl -sS https://getcomposer.org/installer -o composer-setup.php && \
+    php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
+    # Drush launcher
+    drush_launcher_url="https://github.com/drush-ops/drush-launcher/releases/download/${DRUSH_LAUNCHER_VER}/drush.phar" && \
+    wget -O drush.phar "${drush_launcher_url}" && \
+    chmod +x drush.phar && \
+    mv drush.phar /usr/local/bin/drush && \
+    # Drush extensions
+    drush_patchfile_url="https://bitbucket.org/davereid/drush-patchfile.git" && \
+    git clone "${drush_patchfile_url}" /root/.drush/drush-patchfile && \
+    drush_rr_url="https://ftp.drupal.org/files/projects/registry_rebuild-7.x-2.5.tar.gz" && \
+    wget -qO- "${drush_rr_url}" | tar zx -C /root/.drush && \
+    # Drupal console
+    console_url="https://github.com/hechoendrupal/drupal-console-launcher/releases/download/${DRUPAL_CONSOLE_LAUNCHER_VER}/drupal.phar" && \
+    curl "${console_url}" -L -o drupal.phar && \
+    mv drupal.phar /usr/local/bin/drupal && \
+    chmod +x /usr/local/bin/drupal && \
+    # Install Redis client
+    cd /tmp && \
+    wget https://github.com/phpredis/phpredis/archive/master.zip -O phpredis.zip && \
+    unzip -o /tmp/phpredis.zip && mv /tmp/phpredis-* /tmp/phpredis && cd /tmp/phpredis && phpize && ./configure && make && make install && \
+    touch /usr/local/etc/php/conf.d/redis.ini && echo extension=redis.so > /usr/local/etc/php/conf.d/redis.ini
+
+# **********************************************************
+# ***** DEVELOPMENT PURPOSES *******************************
+# **********************************************************
+# Install applications for development purposes
+RUN apt-get install -y vim \
+            openssh-server
+
+# Add certificate for apache SSL
+ADD conf/apache/ssl/localhost.crt /etc/ssl/certs/apache-selfsigned.crt
+ADD conf/apache/ssl/localhost.key /etc/ssl/private/apache-selfsigned.key
+ADD conf/apache/ssl/ssl-params.conf /etc/apache2/conf-available/ssl-params.conf
+RUN a2enmod ssl
+
+# Remove all PHP cache system for development purposes
+RUN { } > /usr/local/etc/php/conf.d/opcache-recommended.ini
+RUN { } > /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+
+# Install XDebug
+RUN pecl install xdebug-2.7.2
+
+# Create user to be available to connect via SSH with the apache group to avoid use root
+RUN useradd docker -m -s /bin/bash \
+  && echo docker:docker | chpasswd \
+  && echo 'export PS1="\u@${APP_NAME:-php}.${ENVIRONMENT_NAME:-container}:\w $ "' > /home/docker/.bashrc \
+  && echo 'cd /var/www/html' >> /home/docker/.bashrc
+
+#Change default apache configuration
+ADD conf/php/virtualhost.conf /etc/apache2/sites-enabled/000-default.conf
+
+# Change PHP configuration
+ADD conf/php/php.ini /usr/local/etc/php/conf.d/php_extended.ini
+
+#Set default directory when access into the container
+WORKDIR /var/www/html

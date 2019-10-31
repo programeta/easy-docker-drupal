@@ -1,0 +1,87 @@
+version: "3.1"
+
+services:
+  mariadb:
+    image: mariadb:10.1
+    container_name: "${PROJECT_NAME}_mariadb"
+    stop_grace_period: 30s
+    environment:
+      MYSQL_ROOT_PASSWORD: $DB_ROOT_PASSWORD
+      MYSQL_DATABASE: $DB_NAME
+      MYSQL_USER: $DB_USER
+      MYSQL_PASSWORD: $DB_PASSWORD
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./initial-database.dmp.sql:/docker-entrypoint-initdb.d/initial-database.dmp.sql
+
+  php:
+    build:
+      context: ./
+      dockerfile: Dockerfile-drupal
+    container_name: "${PROJECT_NAME}_php"
+    environment:
+      #Mail system
+      PHP_SENDMAIL_PATH: /usr/sbin/sendmail -t -i -S mailhog:1025
+      #Apache default user
+      APACHE_RUN_USER: docker
+      APACHE_RUN_GROUP: docker
+      #WebPublica
+      MYSQL_DATABASE: $MYSQL_DATABASE
+      MYSQL_DATABASE_USER: $MYSQL_DATABASE_USER
+      MYSQL_DATABASE_PASS: $MYSQL_DATABASE_PASS
+      MYSQL_DATABASE_HOST: $MYSQL_DATABASE_HOST
+      MYSQL_DATABASE_PORT: $MYSQL_DATABASE_PORT
+      HASH_SALT: $HASH_SALT
+      #Pitch
+      PITCH_MYSQL_DATABASE: $PITCH_MYSQL_DATABASE
+      PITCH_MYSQL_DATABASE_USER: $PITCH_MYSQL_DATABASE_USER
+      PITCH_MYSQL_DATABASE_PASS: $PITCH_MYSQL_DATABASE_PASS
+      PITCH_MYSQL_DATABASE_HOST: $PITCH_MYSQL_DATABASE_HOST
+      PITCH_MYSQL_DATABASE_PORT: $PITCH_MYSQL_DATABASE_PORT
+      PITCH_HASH_SALT: $PITCH_HASH_SALT
+      PITCH_TRUSTED_HOST: $PITCH_TRUSTED_HOST
+      #BlogSCIB
+      BLOG_MYSQL_DATABASE:      $BLOG_MYSQL_DATABASE
+      BLOG_MYSQL_DATABASE_USER: $BLOG_MYSQL_DATABASE_USER
+      BLOG_MYSQL_DATABASE_PASS: $BLOG_MYSQL_DATABASE_PASS
+      BLOG_MYSQL_DATABASE_HOST: $BLOG_MYSQL_DATABASE_HOST
+      BLOG_MYSQL_DATABASE_PORT: $BLOG_MYSQL_DATABASE_PORT
+      BLOG_HASH_SALT:           $BLOG_HASH_SALT
+      BLOG_TRUSTED_HOST:        $BLOG_TRUSTED_HOST
+
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./conf/php/ssh/id_rsa:/home/docker/.ssh/id_rsa
+      - ./conf/php/ssh/id_rsa.pub:/home/docker/.ssh/id_rsa.pub
+      - ./conf/php/git_user_initialize.sh:/home/docker/git_user_initialize.sh
+      - ./html:/var/www/html:delegated
+      - ./shared:/srv/shared
+
+  redis:
+    image: redis:5-alpine
+    container_name: "${PROJECT_NAME}_redis"
+
+  solr:
+    image: solr:8.0
+    container_name: "${PROJECT_NAME}_solr"
+    ports:
+      - "8983:8983"
+    volumes:
+      - solr-data:/var/solr
+      - ./shared:/srv/shared
+    command:
+      - solr-precreate
+      - drupalsolr
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: "${PROJECT_NAME}_mailhog"
+    ports:
+      - "8025:8025"
+
+volumes:
+    code-data:
+    db-data:
+    solr-data:
