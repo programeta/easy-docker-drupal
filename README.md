@@ -197,3 +197,4 @@ We assume that you are located in the docroot of this document to launch this se
 ```
 openssl req -x509 -nodes -days 2048 -newkey rsa:2048 -keyout conf/apache/localhost.key -out conf/apache/localhost.crt
 ```
+
