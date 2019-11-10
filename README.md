@@ -5,7 +5,7 @@ This file contain next sections:
 version of Drupal
 * **[Debug your code](#debug-your-code)** -> Explain how configure the environment and your IDE to debug your code remotely
 * **[Which have this repository](#which-have-this-repository)** -> Explain the files in this repository
-* **[Generate id_rsa and id_rsa.pub](#generate-id_rsa-and-id_rsa.pub)** -> Steps to generate keygen files
+* **[Generate id_rsa and id_rsa.pub](#generate-id_rsa-and-id_rsapub)** -> Steps to generate keygen files
 * **[Generate dummy certificate for SSL](#generate-dummy-certificate-for-ssl)** -> Steps to generate SSL certificate
 
 
