@@ -44,6 +44,13 @@ necessary variables. By default some changes have been implemented to make easy 
 
 If you need enable the XDebug, you need uncomment the lines commented in the php.ini file
 
+### Accessing into container
+To access into container, once the docker-compose is executed, you must launch the sentence:
+```
+docker-compose exec -u docker php bash
+```
+
+
 ## Service "mailhog"
 This service allow send *dummy* emails to log all of them and see the final results.
 
