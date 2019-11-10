@@ -187,11 +187,10 @@ This step explain how to generate the files id_rsa and id_rsa.pub based on linux
 
 You must launch in your host the next sentence:
 ```
-ssh-keygen
+ssh-keygen -f conf/php/ssh/id_rsa -N ""
 ```
-And press enter to respond all questions. Once the process has finished you must copy the files ~\.ssh\id_rsa and ~\.ssh\id_rsa.pub
-in the directory `conf/php/ssh` and replace the files.
-
+This files could be used to connect automatically with any Git without password, you must add the SSH-KEY `conf/php/ssh/id_rsa.pub` in
+the repository to avoid question for user and password...
 
 # Generate dummy certificate for SSL
 We assume that you are located in the docroot of this document to launch this sentence:
