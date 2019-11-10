@@ -50,6 +50,20 @@ To access into container, once the docker-compose is executed, you must launch t
 docker-compose exec -u docker php bash
 ```
 
+### Default PHP version and how to change
+By default this container runs with PHP 7.3, in case that you need downgrade this version you need change in the `Dockerfile-drupal` the
+first line:
+```
+FROM drupal:8-apache
+```
+For this other:
+```
+FROM drupal:7-apache
+```
+Once this lines have been changed you need rebuild the project to take effect the changes.
+```
+docker-compose up -d --build
+```
 
 ## Service "mailhog"
 This service allow send *dummy* emails to log all of them and see the final results.
@@ -103,10 +117,16 @@ By defailt this container expose to host one port:
 ```
 docker-compose up -d --build
 ```
-  * Go into PHP container
+  * Go into PHP container (as root)
 ```
 docker-compose exec php bash
 ```
+
+Additionally this container have an other user to work with no root privileges:
+```
+docker-compose exec <strong>-u docker</strong> php bash
+```
+
 
 Your system is ready to work with new drupal. ENJOY!!
 
