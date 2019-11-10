@@ -122,9 +122,9 @@ docker-compose up -d --build
 docker-compose exec php bash
 ```
 
-Additionally this container have an other user to work with no root privileges:
+Additionally this container have an other user to work with no root privileges, yust adding `-u docker`:
 ```
-docker-compose exec <strong>-u docker</strong> php bash
+docker-compose exec -u docker php bash
 ```
 
 
