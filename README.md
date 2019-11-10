@@ -5,6 +5,8 @@ This file contain next sections:
 version of Drupal
 * **[Debug your code](#debug-your-code)** -> Explain how configure the environment and your IDE to debug your code remotely
 * **[Which have this repository](#which-have-this-repository)** -> Explain the files in this repository
+* **[Generate id_rsa and id_rsa.pub](#generate-id_rsa-and-id_rsa.pub)** -> Steps to generate keygen files
+* **[Generate dummy certificate for SSL](#generate-dummy-certificate-for-ssl)** -> Steps to generate SSL certificate
 
 
 # Containers definition:
@@ -152,3 +154,20 @@ your environment. Please take account that if you want see all these variables i
 (PHP Modules, applications such us `vim`, SSH Server, ...). This image have been extended from a Docker image [Drupal 8](https://hub.docker.com/_/drupal/). Please referer to Docker image to see all available options.
 * `README.md` file -> This file
 
+
+# Generate id_rsa and id_rsa.pub
+This step explain how to generate the files id_rsa and id_rsa.pub based on linux.
+
+You must launch in your host the next sentence:
+```
+ssh-keygen
+```
+And press enter to respond all questions. Once the process has finished you must copy the files ~\.ssh\id_rsa and ~\.ssh\id_rsa.pub
+in the directory `conf/php/ssh` and replace the files.
+
+
+# Generate dummy certificate for SSL
+We assume that you are located in the docroot of this document to launch this sentence:
+```
+openssl req -x509 -nodes -days 2048 -newkey rsa:2048 -keyout conf/apache/localhost.key -out conf/apache/localhost.crt
+```
