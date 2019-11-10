@@ -17,7 +17,7 @@ services:
   php:
     build:
       context: ./
-      dockerfile: Dockerfile-drupal
+      dockerfile: Dockerfile
     container_name: "${PROJECT_NAME}_php"
     environment:
       #Mail system
