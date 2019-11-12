@@ -66,6 +66,15 @@ services:
     ports:
       - "8025:8025"
 
+  portainer:
+    image: portainer/portainer
+    container_name: "${PROJECT_NAME}_portainer"
+    command: --no-auth -H unix:///var/run/docker.sock
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
 volumes:
     code-data:
     db-data:
