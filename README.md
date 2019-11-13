@@ -195,6 +195,6 @@ the repository to avoid question for user and password...
 # Generate dummy certificate for SSL
 We assume that you are located in the docroot of this document to launch this sentence:
 ```
-openssl req -x509 -nodes -days 2048 -newkey rsa:2048 -keyout conf/apache/localhost.key -out conf/apache/localhost.crt
+openssl req -x509 -nodes -days 2048 -newkey rsa:2048 -keyout conf/apache/ssl/localhost.key -out conf/apache/ssl/localhost.crt
 ```
 
