@@ -15,10 +15,10 @@ services:
       - ./initial-database.dmp.sql:/docker-entrypoint-initdb.d/initial-database.dmp.sql
 
   php:
-    image: programeta/drupal-php
-#    build:
-#      context: ./
-#      dockerfile: Dockerfile-drupal
+#    image: programeta/drupal-php
+    build:
+      context: ./
+      dockerfile: Dockerfile-drupal
     container_name: "${PROJECT_NAME}_php"
     environment:
       #Mail system
