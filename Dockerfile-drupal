@@ -37,6 +37,14 @@ RUN set -ex && \
     unzip -o /tmp/phpredis.zip && mv /tmp/phpredis-* /tmp/phpredis && cd /tmp/phpredis && phpize && ./configure && make && make install && \
     touch /usr/local/etc/php/conf.d/redis.ini && echo extension=redis.so > /usr/local/etc/php/conf.d/redis.ini
 
+
+##Installing LDAP php module
+#RUN \
+#    apt-get update && \
+#    apt-get install libldap2-dev -y && \
+#    docker-php-ext-configure ldap && \
+#    docker-php-ext-install ldap
+
 # **********************************************************
 # ***** DEVELOPMENT PURPOSES *******************************
 # **********************************************************
