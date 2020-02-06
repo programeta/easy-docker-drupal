@@ -90,6 +90,11 @@ RUN useradd docker -m -s /bin/bash \
   && echo 'export PS1="\u@${APP_NAME:-php}.${ENVIRONMENT_NAME:-container}:\w $ "' > /home/docker/.bashrc \
   && echo 'cd /var/www/html' >> /home/docker/.bashrc
 
+USER docker
+ADD conf/php/ssh/id_rsa /home/docker/.ssh/id_rsa
+ADD conf/php/ssh/id_rsa.pub /home/docker/.ssh/id_rsa.pub
+USER root
+
 #Change default apache configuration
 ADD conf/php/virtualhost.conf /etc/apache2/sites-enabled/000-default.conf
 

@@ -7,7 +7,7 @@ version of Drupal
 * **[Which have this repository](#which-have-this-repository)** -> Explain the files in this repository
 * **[Generate id_rsa and id_rsa.pub](#generate-id_rsa-and-id_rsapub)** -> Steps to generate keygen files
 * **[Generate dummy certificate for SSL](#generate-dummy-certificate-for-ssl)** -> Steps to generate SSL certificate
-
+* **[Git user initialize](#git-user-initialize)** -> Initialize Git user in `php` container
 
 # Containers definition:
 This local environment have some containers (services) that allow developers work with one or more drupal instances.
@@ -204,3 +204,11 @@ We assume that you are located in the docroot of this document to launch this se
 openssl req -x509 -nodes -days 2048 -newkey rsa:2048 -keyout conf/apache/ssl/localhost.key -out conf/apache/ssl/localhost.crt
 ```
 NOTE: This step is not necessary if you are using the image "programeta/drupal-php". This image have already a dummy SSL certificate
+
+
+
+# Git user initialize
+If you need use Git inside container, you must fill the file `conf/php/git_user_initialize.sh`
+
+This file must be launched every time that the container `php` is created to stablish the proper values to connect with Git. With this
+option you will be avoid the error message when you prepare a commit.
