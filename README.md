@@ -192,9 +192,15 @@ ssh-keygen -f conf/php/ssh/id_rsa -N ""
 This files could be used to connect automatically with any Git without password, you must add the SSH-KEY `conf/php/ssh/id_rsa.pub` in
 the repository to avoid question for user and password...
 
+In case that you are working on linux, you can copy your id_rsa and id_rsa.pub from your .ssh folder
+```
+cp ~/.ssh/id_rsa conf/php/ssh/id_rsa
+cp ~/.ssh/id_rsa.pub conf/php/ssh/id_rsa.pub
+```
+
 # Generate dummy certificate for SSL
 We assume that you are located in the docroot of this document to launch this sentence:
 ```
 openssl req -x509 -nodes -days 2048 -newkey rsa:2048 -keyout conf/apache/ssl/localhost.key -out conf/apache/ssl/localhost.crt
 ```
-
+NOTE: This step is not necessary if you are using the image "programeta/drupal-php". This image have already a dummy SSL certificate

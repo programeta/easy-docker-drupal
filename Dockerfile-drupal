@@ -9,7 +9,8 @@ RUN apt-get update; \
             unzip \
             wget \
             mariadb-client \
-            libphp-predis
+            libphp-predis \
+            awscli
 
 # Install composer, drush launcher, drush extensions, drupal console
 RUN set -ex && \

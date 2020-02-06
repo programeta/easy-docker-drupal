@@ -12,7 +12,6 @@ services:
       MYSQL_PASSWORD: $DB_PASSWORD
     volumes:
       - db-data:/var/lib/mysql
-      - ./initial-database.dmp.sql:/docker-entrypoint-initdb.d/initial-database.dmp.sql
 
   php:
 #    image: programeta/drupal-php
