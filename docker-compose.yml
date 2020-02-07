@@ -2,7 +2,7 @@ version: "3.1"
 
 services:
   mariadb:
-    image: mariadb:10.1
+    image: mariadb:${MARIADB_TAG}
     container_name: "${PROJECT_NAME}_mariadb"
     stop_grace_period: 30s
     environment:
@@ -12,6 +12,9 @@ services:
       MYSQL_PASSWORD: $DB_PASSWORD
     volumes:
       - db-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
 
   php:
 #    image: programeta/drupal-php
@@ -32,7 +35,6 @@ services:
       MYSQL_DATABASE_HOST: $MYSQL_DATABASE_HOST
       MYSQL_DATABASE_PORT: $MYSQL_DATABASE_PORT
       HASH_SALT: $HASH_SALT
-
     ports:
       - "80:80"
       - "443:443"

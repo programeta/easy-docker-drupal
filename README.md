@@ -14,7 +14,8 @@ This local environment have some containers (services) that allow developers wor
 
 ## Service "mariadb"
 Contain environment to load a mariadb database, which have the database stored in a persistent volume /var/lib/mysql.
-Internally have open the port 3306 to be available connected for rest of containers as "mariadb" host
+Internally have open the port 3306 to be available connected for rest of containers as "mariadb" host. Optionally you
+can connect from your Windows machine through port 3306 with credentials defined in `.env` file.
 
 ### Starting a existing Database
 See https://hub.docker.com/_/mariadb for more detailed information
