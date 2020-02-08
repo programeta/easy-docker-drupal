@@ -66,6 +66,21 @@ Once this lines have been changed you need rebuild the project to take effect th
 docker-compose up -d --build
 ```
 
+### Gettings variables in PHP exposed by docker-compose
+When a variable is exposed in the docker-compose.yml file you nedd retrieve her information like this example:
+```
+  $databases['default']['default'] = array (
+    'database' => getenv('MYSQL_DATABASE'),
+    'username' => getenv('MYSQL_DATABASE_USER'),
+    'password' => getenv('MYSQL_DATABASE_PASS'),
+    'host' => getenv('MYSQL_DATABASE_HOST'),
+    'port' => getenv('MYSQL_DATABASE_PORT'),
+    'driver' => 'mysql'
+  );
+```
+
+
+
 ## Service "mailhog"
 This service allow send *dummy* emails to log all of them and see the final results.
 

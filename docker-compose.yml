@@ -14,6 +14,8 @@ services:
       - db-data:/var/lib/mysql
     ports:
       - "3306:3306"
+    networks:
+      - net
 
 
   php:
@@ -22,13 +24,15 @@ services:
       context: ./
       dockerfile: Dockerfile-drupal
     container_name: "${PROJECT_NAME}_php"
+    links:
+      - mariadb
     environment:
       #Mail system
       PHP_SENDMAIL_PATH: /usr/sbin/sendmail -t -i -S mailhog:1025
       #Apache default user
       APACHE_RUN_USER: docker
       APACHE_RUN_GROUP: docker
-      #WebPublica
+      #Database connection
       MYSQL_DATABASE: $MYSQL_DATABASE
       MYSQL_DATABASE_USER: $MYSQL_DATABASE_USER
       MYSQL_DATABASE_PASS: $MYSQL_DATABASE_PASS
@@ -38,6 +42,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    networks:
+      - net
     volumes:
       #Configuration for Apache SSL and Key for user docker to connect with Git or other resources
 #      - ./conf/apache/ssl/localhost.crt:/etc/ssl/certs/apache-selfsigned.crt
@@ -53,10 +59,14 @@ services:
   redis:
     image: redis:5-alpine
     container_name: "${PROJECT_NAME}_redis"
+    networks:
+      - net
 
   solr:
     image: solr:8.0
     container_name: "${PROJECT_NAME}_solr"
+    networks:
+      - net
     ports:
       - "8983:8983"
     volumes:
@@ -69,6 +79,8 @@ services:
   mailhog:
     image: mailhog/mailhog
     container_name: "${PROJECT_NAME}_mailhog"
+    networks:
+      - net
     ports:
       - "8025:8025"
 
@@ -76,12 +88,18 @@ services:
     image: portainer/portainer
     container_name: "${PROJECT_NAME}_portainer"
     command: --no-auth -H unix:///var/run/docker.sock
+    networks:
+      - net
     ports:
       - "9000:9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
-    code-data:
-    db-data:
-    solr-data:
+  code-data:
+  db-data:
+  solr-data:
+
+networks:
+  net:
+    driver: bridge
