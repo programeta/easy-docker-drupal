@@ -95,6 +95,23 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
+  selenium:
+    image: selenium/standalone-chrome-debug
+    ports:
+      - 4444:4444
+      - 5900:5900
+    volumes:
+      - /dev/shm:/dev/shm
+    environment:
+      VNC_NO_PASSWORD: 1
+
+  novnc:
+    image: dougw/novnc
+    ports:
+      - 8081:8081
+    environment:
+      REMOTE_HOST: selenium
+
 volumes:
   code-data:
   db-data:
