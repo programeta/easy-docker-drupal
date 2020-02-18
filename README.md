@@ -129,6 +129,17 @@ By defailt this container expose to host one port:
 # FIRST STEPS:
 * Once you had configured the previous steps you only need this actions:
 
+  * Generate Dummy SSL Certificate
+```
+openssl req -x509 -nodes -days 2048 -newkey rsa:2048 -keyout conf/apache/ssl/localhost.key -out conf/apache/ssl/localhost.crt
+```
+
+  * Generate id_rsa
+```
+cp ~/.ssh/id_rsa conf/php/ssh/id_rsa
+cp ~/.ssh/id_rsa.pub conf/php/ssh/id_rsa.pub
+```
+
   * Initialize docker
 ```
 docker-compose up -d --build
