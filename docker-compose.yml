@@ -46,13 +46,8 @@ services:
       - net
     volumes:
       #Configuration for Apache SSL and Key for user docker to connect with Git or other resources
-#      - ./conf/apache/ssl/localhost.crt:/etc/ssl/certs/apache-selfsigned.crt
-#      - ./conf/apache/ssl/localhost.key:/etc/ssl/private/apache-selfsigned.key
-#      - ./conf/apache/ssl/ssl-params.conf:/etc/apache2/conf-available/ssl-params.conf
-#      - ./conf/php/virtualhost.conf:/etc/apache2/sites-enabled/virtualhost.conf
-#      - ./conf/php/ssh/id_rsa:/home/docker/.ssh/id_rsa
-#      - ./conf/php/ssh/id_rsa.pub:/home/docker/.ssh/id_rsa.pub
       - ./conf/php/git_user_initialize.sh:/home/docker/git_user_initialize.sh
+      - ./logs:/var/log/apache2/docker
       - ./html:/var/www/html:delegated
       - ./shared:/srv/shared
 
