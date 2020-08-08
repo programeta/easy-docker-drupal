@@ -76,6 +76,7 @@ services:
 
   selenium:
     image: selenium/standalone-chrome-debug
+    container_name: "${PROJECT_NAME}_selenium"
     ports:
       - 4444:4444
       - 5900:5900
@@ -86,6 +87,7 @@ services:
 
   novnc:
     image: dougw/novnc
+    container_name: "${PROJECT_NAME}_novnc"
     ports:
       - 8081:8081
     environment:
