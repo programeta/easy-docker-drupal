@@ -2,14 +2,11 @@ version: "3.1"
 
 services:
   mariadb:
-    image: mariadb:${MARIADB_TAG}
+    image: mariadb:10.5
     container_name: "${PROJECT_NAME}_mariadb"
     stop_grace_period: 30s
-    environment:
-      MYSQL_ROOT_PASSWORD: $DB_ROOT_PASSWORD
-      MYSQL_DATABASE: $DB_NAME
-      MYSQL_USER: $DB_USER
-      MYSQL_PASSWORD: $DB_PASSWORD
+    env_file:
+      - ./.env
     volumes:
       - db-data:/var/lib/mysql
     ports:
@@ -17,28 +14,15 @@ services:
     networks:
       - net
 
-
   php:
-#    image: programeta/drupal-php
     build:
       context: ./
       dockerfile: Dockerfile-drupal
     container_name: "${PROJECT_NAME}_php"
     links:
       - mariadb
-    environment:
-      #Mail system
-      PHP_SENDMAIL_PATH: /usr/sbin/sendmail -t -i -S mailhog:1025
-      #Apache default user
-      APACHE_RUN_USER: docker
-      APACHE_RUN_GROUP: docker
-      #Database connection
-      MYSQL_DATABASE: $MYSQL_DATABASE
-      MYSQL_DATABASE_USER: $MYSQL_DATABASE_USER
-      MYSQL_DATABASE_PASS: $MYSQL_DATABASE_PASS
-      MYSQL_DATABASE_HOST: $MYSQL_DATABASE_HOST
-      MYSQL_DATABASE_PORT: $MYSQL_DATABASE_PORT
-      HASH_SALT: $HASH_SALT
+    env_file:
+      - ./.env
     ports:
       - "80:80"
       - "443:443"
@@ -92,6 +76,7 @@ services:
 
   selenium:
     image: selenium/standalone-chrome-debug
+    container_name: "${PROJECT_NAME}_selenium"
     ports:
       - 4444:4444
       - 5900:5900
@@ -102,6 +87,7 @@ services:
 
   novnc:
     image: dougw/novnc
+    container_name: "${PROJECT_NAME}_novnc"
     ports:
       - 8081:8081
     environment:

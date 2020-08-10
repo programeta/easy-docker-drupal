@@ -84,7 +84,7 @@ RUN { \
 
 
 # Install XDebug
-RUN pecl install xdebug-2.7.2
+RUN pecl install xdebug
 
 # Create user to be available to connect via SSH with the apache group to avoid use root
 RUN useradd docker -m -s /bin/bash \
