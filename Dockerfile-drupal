@@ -88,14 +88,13 @@ RUN pecl install xdebug-2.7.2
 
 # Create user to be available to connect via SSH with the apache group to avoid use root
 RUN useradd docker -m -s /bin/bash \
-  && echo docker:docker | chpasswd \
-  && echo 'export PS1="\u@${APP_NAME:-php}.${ENVIRONMENT_NAME:-container}:\w $ "' > /home/docker/.bashrc \
-  && echo 'cd /var/www/html' >> /home/docker/.bashrc
-
-USER docker
+  && echo docker:docker | chpasswd
+RUN curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o /home/docker/.git-completion.bash
+ADD conf/php/.bashrc /home/docker/.bashrc
 ADD conf/php/ssh/id_rsa /home/docker/.ssh/id_rsa
 ADD conf/php/ssh/id_rsa.pub /home/docker/.ssh/id_rsa.pub
-USER root
+RUN chown -R docker:docker /home/docker/
+RUN chmod 400 /home/docker/.ssh/id_rsa
 
 #Change default apache configuration
 ADD conf/php/virtualhost.conf /etc/apache2/sites-enabled/000-default.conf

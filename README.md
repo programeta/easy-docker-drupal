@@ -45,6 +45,9 @@ necessary variables. By default some changes have been implemented to make easy 
 
 If you need enable the XDebug, you need uncomment the lines commented in the php.ini file
 
+### Support git autocompletion
+This version support git autocompletion
+
 ### Accessing into container
 To access into container, once the docker-compose is executed, you must launch the sentence:
 ```
