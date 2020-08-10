@@ -12,6 +12,19 @@ RUN apt-get update; \
             libphp-predis \
             awscli
 
+## UNCOMMENT IF POSTGRES CONTAINER IS ENABLED
+##------------------------
+## #Prepare Postgre client installation
+## RUN apt-get update && \
+##     apt-get install -y lsb-release gnupg2 wget
+## RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc > /tmp/postgres.pgp
+## RUN apt-key add /tmp/postgres.pgp
+## RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" |tee /etc/apt/sources.list.d/pgdg.list
+## RUN apt-get update; \
+##   apt-get install -y postgresql-client-12
+##------------------------
+
+
 # Install composer, drush launcher, drush extensions, drupal console
 RUN set -ex && \
     cd ~ && \
