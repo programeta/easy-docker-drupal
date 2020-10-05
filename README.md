@@ -1,13 +1,43 @@
 # What contains this README file
 This file contain next sections:
-* **[Containers definition](#containers-definition)** -> Explain all containers that have been used to work in your local environment
 * **[First steps](#first-steps)** -> Explain how to change the downloaded project to the final Git repository and how deploy your first
 version of Drupal
+* **[Containers definition](#containers-definition)** -> Explain all containers that have been used to work in your local environment
 * **[Debug your code](#debug-your-code)** -> Explain how configure the environment and your IDE to debug your code remotely
 * **[Which have this repository](#which-have-this-repository)** -> Explain the files in this repository
 * **[Generate id_rsa and id_rsa.pub](#generate-id_rsa-and-id_rsapub)** -> Steps to generate keygen files
 * **[Generate dummy certificate for SSL](#generate-dummy-certificate-for-ssl)** -> Steps to generate SSL certificate
 * **[Git user initialize](#git-user-initialize)** -> Initialize Git user in `php` container
+
+# First steps
+  * To prepare your new local environment you only need to initialize the environment using the sentence
+```
+sh initialize.sh
+```
+  * Once initialize the environment you will able to start environment using sentence
+```
+docker-compose up -d --build
+```
+  * Go into PHP container (as root)
+```
+docker-compose exec php bash
+```
+
+Additionally this container have an other user to work with no root privileges, just adding `-u docker`:
+```
+docker-compose exec -u docker php bash
+```
+
+This environment configure a default database called `drupal` with user `root` and password `root`
+
+# Configure your project in Apache
+A configuration for apache is mandatory to see your portal in LOCAL environment,
+for that you need modify your file "conf/php/virtualhost.conf" and configure only the "<VirtualHost *:443>" section.
+You are able to add many portals as you portal need in this environment. Generating a `VirtualHost`for each one.
+
+# Modify your "hosts" file
+Is very important that your file "/etc/hosts" or "c:\windows\drivers\etc\hosts" will be modified
+to add a resolution for `ServerName` defined in your `VirtualHost` configuration.
 
 # Containers definition:
 This local environment have some containers (services) that allow developers work with one or more drupal instances.
