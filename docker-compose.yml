@@ -9,6 +9,7 @@ services:
       - ./.env
     volumes:
       - db-data:/var/lib/mysql
+      - ./shared:/srv/shared
     ports:
       - "3306:3306"
     networks:
@@ -75,35 +76,35 @@ services:
     ports:
       - "8025:8025"
 
-  portainer:
-    image: portainer/portainer
-    container_name: "${PROJECT_NAME}_portainer"
-    command: --no-auth -H unix:///var/run/docker.sock
-    networks:
-      - net
-    ports:
-      - "9000:9000"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+#  portainer:
+#    image: portainer/portainer
+#    container_name: "${PROJECT_NAME}_portainer"
+#    command: --no-auth -H unix:///var/run/docker.sock
+#    networks:
+#      - net
+#    ports:
+#      - "9000:9000"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
 
-  selenium:
-    image: selenium/standalone-chrome-debug
-    container_name: "${PROJECT_NAME}_selenium"
-    ports:
-      - 4444:4444
-      - 5900:5900
-    volumes:
-      - /dev/shm:/dev/shm
-    environment:
-      VNC_NO_PASSWORD: 1
+#  selenium:
+#    image: selenium/standalone-chrome-debug
+#    container_name: "${PROJECT_NAME}_selenium"
+#    ports:
+#      - 4444:4444
+#      - 5900:5900
+#    volumes:
+#      - /dev/shm:/dev/shm
+#    environment:
+#      VNC_NO_PASSWORD: 1
 
-  novnc:
-    image: dougw/novnc
-    container_name: "${PROJECT_NAME}_novnc"
-    ports:
-      - 8081:8081
-    environment:
-      REMOTE_HOST: selenium
+#  novnc:
+#    image: dougw/novnc
+#    container_name: "${PROJECT_NAME}_novnc"
+#    ports:
+#      - 8081:8081
+#    environment:
+#      REMOTE_HOST: selenium
 
 volumes:
   code-data:
