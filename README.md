@@ -10,7 +10,7 @@ version of Drupal
 * **[Git user initialize](#git-user-initialize)** -> Initialize Git user in `php` container
 
 # First steps
-* To prepare your new local environment you only need to initialize the environment using the sentence
+1.- To prepare your new local environment you only need to initialize the environment using the sentence
 ```
 sh initialize.sh
 ```
@@ -22,11 +22,11 @@ This script make a basic configuration in:
     * ServerName will be the name that you entered, for example, mi-first-environment.vm
     * DocumentRoot is established to respond in path '/var/www/html/mi-first-environment/web'
 
-* Once initialize the environment you will able to start environment using sentence
+2.- Once initialize the environment you will able to start environment using sentence
 ```
 docker-compose up -d --build
 ```
-* Go into PHP container (as root)
+3.- Go into PHP container (as root)
 ```
 docker-compose exec php bash
 ```
