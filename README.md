@@ -14,6 +14,14 @@ version of Drupal
 ```
 sh initialize.sh
 ```
+This script make a basic configuration in:
+  ** Who containers are named (this ensure that no collision between projects, one project one easy-docker-drupal)
+  ** Copy your id_rsa and id_rsa.pub into PHP container to use the same SSH Keys in GitLab or GitHub
+  ** Generate a dummy SSL Certificate to work under https in this environment
+  ** Make changes in your VirtualHost where:
+  *** ServerName will be the name that you entered, for example, mi-first-environment.vm
+  *** DocumentRoot is established to respond in path '/var/www/html/mi-first-environment/web'
+
   * Once initialize the environment you will able to start environment using sentence
 ```
 docker-compose up -d --build
