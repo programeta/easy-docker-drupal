@@ -71,11 +71,12 @@ By defailt this container expose to host two ports:
 * 80    -> Apache HTTP request
 * 443   -> Apache HTTPS request
 
-You must set your certtificate replacing the files that exists in `conf/apache/ssl`. If you do not need SSL certificate review
-the `conf/php/virtualhost.conf` to remove the VirtualHost for SSL and remove in the VirtualHost:80 the redirection to SSL
+By default a dummy certificate is created when you launch the `inicialize.sh` script. All request in port 80 will be
+redirected to port 443.
+You are able to add more projects by creating the VirtualHost  entry in the file `conf/php/virtualhost.conf`
 
 ### Where drupal is stored
-Drupal will be stored in `html` folder, here you must deploy yor project and configure it in the VirtualHost setting the correct DocumentRoot path
+Drupal will be stored in `html` folder, here you must deploy your project and configure it in the VirtualHost setting the correct DocumentRoot path
 
 ### Modifiyng the default php.ini values
 You are able to change the default php.ini values, to do that you need to modify the file `conf/php/php.ini` and modify all
@@ -96,10 +97,10 @@ docker-compose exec -u docker php bash
 ```
 
 ### Default PHP version and how to change
-By default this container runs with PHP 7.3, in case that you need downgrade this version you need change in the `Dockerfile-drupal` the
+By default this container runs with PHP 7.4, in case that you need downgrade this version you need change in the `Dockerfile-drupal` the
 first line:
 ```
-FROM drupal:8-apache
+FROM drupal:9-apache
 ```
 For this other:
 ```
@@ -149,11 +150,11 @@ This service is a cache for Drupal. You will need install the module `redis` (al
 
 Once the module is enabled, you can add the next information in your `settings.php` file:
 ```
-$settings['redis.connection']['interface'] = 'Predis'; // Can be "Predis".
+$settings['redis.connection']['interface'] = 'PhpRedis'; // Can be "Predis".
 $settings['redis.connection']['host']      = 'redis';  // Your Redis instance hostname.
-$settings['redis.connection']['port']      = '6379';  // Redis port
 $settings['cache']['default'] = 'cache.backend.redis';
 ```
+The PHP container (or service) is configured with all libraries to use PHPRedis.
 
 The system automatically connect with Redis. You can see in `Status report` if the module works properly.
 
@@ -168,38 +169,6 @@ properly the connection.
 ### Available ports
 By defailt this container expose to host one port:
 * 8983 -> Apache Solr request
-
-
-# FIRST STEPS:
-* Once you had configured the previous steps you only need this actions:
-
-  * Generate Dummy SSL Certificate
-```
-openssl req -x509 -nodes -days 2048 -newkey rsa:2048 -keyout conf/apache/ssl/localhost.key -out conf/apache/ssl/localhost.crt
-```
-
-  * Generate id_rsa
-```
-cp ~/.ssh/id_rsa conf/php/ssh/id_rsa
-cp ~/.ssh/id_rsa.pub conf/php/ssh/id_rsa.pub
-```
-
-  * Initialize docker
-```
-docker-compose up -d --build
-```
-  * Go into PHP container (as root)
-```
-docker-compose exec php bash
-```
-
-Additionally this container have an other user to work with no root privileges, just adding `-u docker`:
-```
-docker-compose exec -u docker php bash
-```
-
-
-Your system is ready to work with new drupal. ENJOY!!
 
 # DEBUG your code:
 This section is explained to work with Visual Studio Code...
