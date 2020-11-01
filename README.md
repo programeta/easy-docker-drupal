@@ -22,7 +22,7 @@ This script makes a basic configuration in:
     * ServerName will be the name that you entered, for example, mi-first-environment.vm
     * DocumentRoot is established to respond in path '/var/www/html/mi-first-environment/web'
 
-2.- Once initialize the environment you will able to start environment using sentence
+2.- Once initialized the environment you will able to start environment using sentence
 ```
 docker-compose up -d --build
 ```
@@ -38,12 +38,15 @@ docker-compose exec -u docker php bash
 
 This environment configure a default database called `drupal` with user `root` and password `root`
 
-# Configure your project in Apache
-A configuration for apache is mandatory to see your portal in LOCAL environment,
-for that you need modify your file "conf/php/virtualhost.conf" and configure only the "<VirtualHost *:443>" section.
-You are able to add many portals as you portal need in this environment. Generating a `VirtualHost`for each one.
+## Configure your project in Apache
+By default the VirtualHost has been configured using the script `initialize.sh`, you can modify
+the file "conf/php/virtualhost.conf" if you need some extra configuration to perform your website.
+The VirtualHost based in port 80 is used to force a redirection to 443 port, avoiding the use
+of insecure pages.
+You can add more than one VirtualHost to make this environment multipurpose for more than
+one Drupal project.
 
-# Modify your "hosts" file
+## Modify your "hosts" file
 Is very important that your file "/etc/hosts" or "c:\windows\drivers\etc\hosts" will be modified
 to add a resolution for `ServerName` defined in your `VirtualHost` configuration.
 
