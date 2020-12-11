@@ -1,3 +1,9 @@
+#Prepare initial instance for an official image of Drupal based on Docker Hub
+#https://hub.docker.com/_/drupal/
+#
+# To work with PHP8.0 set "FROM drupal:9-apache"
+# To work with PHP7.4 set "FROM drupal:8-apache"
+#
 FROM drupal:9-apache
 
 ENV DRUSH_LAUNCHER_VER="0.6.0" \
