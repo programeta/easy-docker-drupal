@@ -19,7 +19,7 @@ services:
 #    image: postgres:12
 #    container_name: "${PROJECT_NAME}_postgres"
 #    volumes:
-#      - postgres-data12:/var/lib/postgresql/data
+#      - postgres-data:/var/lib/postgresql/data
 #    env_file:
 #      - ./.env
 #    ports:
@@ -54,19 +54,19 @@ services:
     networks:
       - net
 
-  solr:
-    image: solr:8.0
-    container_name: "${PROJECT_NAME}_solr"
-    networks:
-      - net
-    ports:
-      - "8983:8983"
-    volumes:
-      - solr-data:/var/solr
-      - ./shared:/srv/shared
-    command:
-      - solr-precreate
-      - drupalsolr
+  # solr:
+  #   image: solr:8.0
+  #   container_name: "${PROJECT_NAME}_solr"
+  #   networks:
+  #     - net
+  #   ports:
+  #     - "8983:8983"
+  #   volumes:
+  #     - solr-data:/var/solr
+  #     - ./shared:/srv/shared
+  #   command:
+  #     - solr-precreate
+  #     - drupalsolr
 
   mailhog:
     image: mailhog/mailhog
@@ -110,7 +110,7 @@ volumes:
   code-data:
   db-data:
   solr-data:
-  postgres-data12:
+  postgres-data:
 
 networks:
   net:

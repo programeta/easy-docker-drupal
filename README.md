@@ -12,7 +12,7 @@ version of Drupal
 # First steps
 1.- To prepare your new local environment you only need to initialize the environment using the sentence
 ```
-sh initialize.sh
+sh scripts/initialize.sh
 ```
 This script makes a basic configuration in:
   * Who containers are named (this ensure that no collision between projects, one project one easy-docker-drupal)

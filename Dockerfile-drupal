@@ -6,8 +6,12 @@
 #
 FROM drupal:9-apache
 
-ENV DRUSH_LAUNCHER_VER="0.6.0" \
-    DRUPAL_CONSOLE_LAUNCHER_VER="1.9.3"
+ENV DRUSH_LAUNCHER_VER="0.9.0" \
+    DRUPAL_CONSOLE_LAUNCHER_VER="1.9.7"
+
+#Enable proper composer version (default version 1)
+ENV COMPOSER_VERSION="1"
+#ENV COMPOSER_VERSION="2"
 
 RUN apt-get update -y; \
   apt-get install -y net-tools \
@@ -34,7 +38,7 @@ RUN apt-get update -y; \
 RUN set -ex && \
     cd ~ && \
     curl -sS https://getcomposer.org/installer -o composer-setup.php && \
-    php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
+    php composer-setup.php --install-dir=/usr/local/bin --filename=composer --${COMPOSER_VERSION} && \
     # Drush launcher
     drush_launcher_url="https://github.com/drush-ops/drush-launcher/releases/download/${DRUSH_LAUNCHER_VER}/drush.phar" && \
     wget -O drush.phar "${drush_launcher_url}" && \
