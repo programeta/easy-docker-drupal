@@ -41,7 +41,6 @@ cat scripts/templates-dc/edd-dc-${DATABASE_ENGINE}.yml >> docker-compose.yml
 cat scripts/templates-dc/edd-dc-${WEBSERVER_ENGINE}.yml >> docker-compose.yml
 cat scripts/templates-dc/edd-dc-${SEARCH_ENGINE}.yml >> docker-compose.yml
 
-
 if [ ${MAILHOG_ENGINE} == 'yes' ]
 then
   cat scripts/templates-dc/edd-dc-mailhog.yml >> docker-compose.yml
@@ -51,9 +50,6 @@ if [ ${REDIS_ENGINE} == 'yes' ]
 then
   cat scripts/templates-dc/edd-dc-redis.yml >> docker-compose.yml
 fi
-
-exit
-
 
 printf "${GREEN}Configuring environment...${NC}\n"
 printf "  Modifying environment name...${NC}\n"
