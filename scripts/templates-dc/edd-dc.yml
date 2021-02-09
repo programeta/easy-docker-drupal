@@ -1,0 +1,13 @@
+version: "3.1"
+
+volumes:
+  code-data:
+  db-data:
+  solr-data:
+  postgres-data:
+
+networks:
+  net:
+    driver: bridge
+
+services:

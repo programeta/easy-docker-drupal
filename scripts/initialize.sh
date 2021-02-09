@@ -9,9 +9,51 @@ PURPLE='\033[0;35m'
 #Get script folder
 WORK_DIR=$( cd "$( dirname "$0" )" && pwd )/..
 
-printf '\n'
+
+printf 'Welcome to easy-docker-drupal configuration:\n'
 printf "Please, input the name of the project (without spaces): "
 read PROJECT_NAME
+
+printf "Please, select database storage (mariadb/postgres) [mariadb]: "
+read input_db
+DATABASE_ENGINE=${input_db:-mariadb}
+
+
+printf "Please, select webserver engine (apache/nginx) [apache]: "
+read input_ws
+WEBSERVER_ENGINE=${input_ws:-apache}
+
+printf "Please, select search engine (solr/elastic) [solr]: "
+read input_se
+SEARCH_ENGINE=${input_se:-solr}
+
+printf "Mailhog enabled (yes/no) [yes]: "
+read input_mh
+MAILHOG_ENGINE=${input_mh:-yes}
+
+
+printf "Redis enabled (yes/no) [yes]: "
+read input_rd
+REDIS_ENGINE=${input_rd:-yes}
+
+cat scripts/templates-dc/edd-dc.yml > docker-compose.yml
+cat scripts/templates-dc/edd-dc-${DATABASE_ENGINE}.yml >> docker-compose.yml
+cat scripts/templates-dc/edd-dc-${WEBSERVER_ENGINE}.yml >> docker-compose.yml
+cat scripts/templates-dc/edd-dc-${SEARCH_ENGINE}.yml >> docker-compose.yml
+
+
+if [ ${MAILHOG_ENGINE} == 'yes' ]
+then
+  cat scripts/templates-dc/edd-dc-mailhog.yml >> docker-compose.yml
+fi
+
+if [ ${REDIS_ENGINE} == 'yes' ]
+then
+  cat scripts/templates-dc/edd-dc-redis.yml >> docker-compose.yml
+fi
+
+exit
+
 
 printf "${GREEN}Configuring environment...${NC}\n"
 printf "  Modifying environment name...${NC}\n"
@@ -19,9 +61,11 @@ sed -i "s/PROJECT_NAME=vm/PROJECT_NAME=${PROJECT_NAME}/g" ${WORK_DIR}/.env
 
 #Check if exists certificates to generate certificates for environment
 FILE=~/.ssh/id_rsa
-if [ ! -f "$FILE" ]; then
+if [ ! -f "${FILE}" ]
+then
     printf "  Generating SSH keys...${NC}\n"
     ssh-keygen -t rsa -f ~/.ssh/id_rsa -q -P ""
+else
 fi
 
 #Copy certificates from local into environment

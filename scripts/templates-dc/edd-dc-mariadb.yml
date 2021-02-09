@@ -1,0 +1,14 @@
+  mariadb:
+    image: mariadb:10.5
+    container_name: "${PROJECT_NAME}_mariadb"
+    stop_grace_period: 30s
+    env_file:
+      - ./.env
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./shared:/srv/shared
+    ports:
+      - "3306:3306"
+    networks:
+      - net
+
