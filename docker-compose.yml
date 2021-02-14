@@ -1,117 +1,14 @@
 version: "3.1"
 
-services:
-  mariadb:
-    image: mariadb:10.5
-    container_name: "${PROJECT_NAME}_mariadb"
-    stop_grace_period: 30s
-    env_file:
-      - ./.env
-    volumes:
-      - db-data:/var/lib/mysql
-      - ./shared:/srv/shared
-    ports:
-      - "3306:3306"
-    networks:
-      - net
-
-#  postgres:
-#    image: postgres:12
-#    container_name: "${PROJECT_NAME}_postgres"
-#    volumes:
-#      - postgres-data:/var/lib/postgresql/data
-#    env_file:
-#      - ./.env
-#    ports:
-#      - "5432:5432"
-#    networks:
-#      - net
-
-  php:
-    build:
-      context: ./
-      dockerfile: Dockerfile-drupal
-    container_name: "${PROJECT_NAME}_php"
-    links:
-      - mariadb
-    env_file:
-      - ./.env
-    ports:
-      - "80:80"
-      - "443:443"
-    networks:
-      - net
-    volumes:
-      #Configuration for Apache SSL and Key for user docker to connect with Git or other resources
-      - ./conf/php/git_user_initialize.sh:/home/docker/git_user_initialize.sh
-      - ./logs:/var/log/apache2/docker
-      - ./html:/var/www/html:delegated
-      - ./shared:/srv/shared
-
-  redis:
-    image: redis:5-alpine
-    container_name: "${PROJECT_NAME}_redis"
-    networks:
-      - net
-
-  # solr:
-  #   image: solr:8.0
-  #   container_name: "${PROJECT_NAME}_solr"
-  #   networks:
-  #     - net
-  #   ports:
-  #     - "8983:8983"
-  #   volumes:
-  #     - solr-data:/var/solr
-  #     - ./shared:/srv/shared
-  #   command:
-  #     - solr-precreate
-  #     - drupalsolr
-
-  mailhog:
-    image: mailhog/mailhog
-    container_name: "${PROJECT_NAME}_mailhog"
-    networks:
-      - net
-    ports:
-      - "8025:8025"
-
-#  portainer:
-#    image: portainer/portainer
-#    container_name: "${PROJECT_NAME}_portainer"
-#    command: --no-auth -H unix:///var/run/docker.sock
-#    networks:
-#      - net
-#    ports:
-#      - "9000:9000"
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-
-#  selenium:
-#    image: selenium/standalone-chrome-debug
-#    container_name: "${PROJECT_NAME}_selenium"
-#    ports:
-#      - 4444:4444
-#      - 5900:5900
-#    volumes:
-#      - /dev/shm:/dev/shm
-#    environment:
-#      VNC_NO_PASSWORD: 1
-
-#  novnc:
-#    image: dougw/novnc
-#    container_name: "${PROJECT_NAME}_novnc"
-#    ports:
-#      - 8081:8081
-#    environment:
-#      REMOTE_HOST: selenium
-
 volumes:
   code-data:
   db-data:
   solr-data:
   postgres-data:
+  elastic-data:
 
 networks:
   net:
     driver: bridge
+
+services:

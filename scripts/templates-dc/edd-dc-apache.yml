@@ -1,10 +1,8 @@
   php:
     build:
-      context: ./
-      dockerfile: Dockerfile-drupal
+      context: ./conf
+      dockerfile: Dockerfile-php-apache
     container_name: "${PROJECT_NAME}_php"
-    links:
-      - mariadb
     env_file:
       - ./.env
     ports:
