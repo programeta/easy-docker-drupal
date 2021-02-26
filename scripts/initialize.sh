@@ -71,11 +71,13 @@ fi
 
 #Copy certificates from local into environment
 printf "  Copying SSH keys...${NC}\n"
-cp ~/.ssh/id_rsa ${WORK_DIR}/conf/php/ssh/id_rsa
-cp ~/.ssh/id_rsa.pub ${WORK_DIR}/conf/php/ssh/id_rsa.pub
+mkdir -p ${WORK_DIR}/conf/ssh
+cp ~/.ssh/id_rsa ${WORK_DIR}/conf/ssh/id_rsa
+cp ~/.ssh/id_rsa.pub ${WORK_DIR}/conf/ssh/id_rsa.pub
 
 #Generate certificate for HTTPS
 printf "  Generating SSL certificate for apache...${NC}\n"
+mkdir -p ${WORK_DIR}/conf/ssl
 openssl req -x509 -new -newkey rsa:4096 -nodes -days 2048 \
     -keyout ${WORK_DIR}/conf/ssl/localhost.key -out ${WORK_DIR}/conf/ssl/localhost.crt \
     -subj "/C=ES/O=DEX/OU=CEPPHP/CN=${PROJECT_NAME}.vm" > /dev/null 2>&1
