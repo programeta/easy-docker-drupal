@@ -112,8 +112,8 @@ RUN useradd docker -m -s /bin/bash \
   && echo docker:docker | chpasswd
 RUN curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o /home/docker/.git-completion.bash
 ADD php/.bashrc /home/docker/.bashrc
-ADD php/ssh/id_rsa /home/docker/.ssh/id_rsa
-ADD php/ssh/id_rsa.pub /home/docker/.ssh/id_rsa.pub
+ADD ssh/id_rsa /home/docker/.ssh/id_rsa
+ADD ssh/id_rsa.pub /home/docker/.ssh/id_rsa.pub
 RUN chown -R docker:docker /home/docker/
 RUN chmod 400 /home/docker/.ssh/id_rsa
 
