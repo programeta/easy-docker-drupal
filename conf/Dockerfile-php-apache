@@ -10,8 +10,8 @@ ENV DRUSH_LAUNCHER_VER="0.9.0" \
     DRUPAL_CONSOLE_LAUNCHER_VER="1.9.7"
 
 #Enable proper composer version (default version 1)
-ENV COMPOSER_VERSION="1"
-#ENV COMPOSER_VERSION="2"
+#ENV COMPOSER_VERSION="1"
+ENV COMPOSER_VERSION="2"
 
 RUN apt-get update -y; \
   apt-get install -y net-tools \
