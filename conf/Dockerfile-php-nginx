@@ -1,5 +1,5 @@
-#FROM php:8-fpm
-FROM php:7.4-fpm
+FROM php:8-fpm
+#FROM php:7.4-fpm
 #FROM php:7.3-fpm
 
 ENV DRUSH_LAUNCHER_VER="0.9.0" \
@@ -118,7 +118,7 @@ ADD ./php/php.ini /usr/local/etc/php/php.ini
 # Install XDebug
 ###RUN pecl install xdebug
 
-#### Create user to be available to connect via SSH with the apache group to avoid use root
+#### Create user
 RUN useradd docker -m -s /bin/bash \
   && echo docker:docker | chpasswd
 RUN curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o /home/docker/.git-completion.bash
