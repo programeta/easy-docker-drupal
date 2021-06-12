@@ -10,8 +10,8 @@ ENV DRUSH_LAUNCHER_VER="0.9.0" \
     DRUPAL_CONSOLE_LAUNCHER_VER="1.9.7"
 
 #Enable proper composer version (default version 1)
-ENV COMPOSER_VERSION="1"
-#ENV COMPOSER_VERSION="2"
+#ENV COMPOSER_VERSION="1"
+ENV COMPOSER_VERSION="2"
 
 RUN apt-get update -y; \
   apt-get install -y net-tools \
@@ -112,8 +112,8 @@ RUN useradd docker -m -s /bin/bash \
   && echo docker:docker | chpasswd
 RUN curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o /home/docker/.git-completion.bash
 ADD php/.bashrc /home/docker/.bashrc
-ADD php/ssh/id_rsa /home/docker/.ssh/id_rsa
-ADD php/ssh/id_rsa.pub /home/docker/.ssh/id_rsa.pub
+ADD ssh/id_rsa /home/docker/.ssh/id_rsa
+ADD ssh/id_rsa.pub /home/docker/.ssh/id_rsa.pub
 RUN chown -R docker:docker /home/docker/
 RUN chmod 400 /home/docker/.ssh/id_rsa
 
