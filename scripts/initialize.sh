@@ -85,9 +85,9 @@ printf "  Modifying Virtualhost...${NC}\n"
 if [ ${WEBSERVER_ENGINE} == 'nginx' ]
 then
   sed -i "s/\/usr\/share\/nginx\/html\/your.docroot.project\/web;/\/usr\/share\/nginx\/html\/${PROJECT_NAME}\/web;/g" ./conf/nginx/nginx.d/default.conf
-  sed -i "s/server_name your.domain/server_name ${PROJECT_NAME};/g" ${WORK_DIR}/conf/nginx/nginx.d/default.conf
+  sed -i "s/server_name your.domain/server_name ${PROJECT_NAME}/g" ${WORK_DIR}/conf/nginx/nginx.d/default.conf
 else
-  sed -i "s/your.domain/${PROJECT_NAME}.vm/g" ${WORK_DIR}/conf/apache/virtualhost.conf
+  sed -i "s/your.domain/${PROJECT_NAME}/g" ${WORK_DIR}/conf/apache/virtualhost.conf
   sed -i "s/your.docroot.project/${PROJECT_NAME}/g" ${WORK_DIR}/conf/apache/virtualhost.conf
 fi
 
