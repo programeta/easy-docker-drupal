@@ -1,0 +1,19 @@
+  php:
+    build:
+      context: ./conf
+      dockerfile: Dockerfile-php-apache
+    container_name: "${PROJECT_NAME}_php"
+    env_file:
+      - ./.env
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - net
+    volumes:
+      #Configuration for Apache SSL and Key for user docker to connect with Git or other resources
+      - ./conf/php/git_user_initialize.sh:/home/docker/git_user_initialize.sh
+      - ./logs:/var/log/apache2/docker
+      - ./html:/var/www/html:delegated
+      - ./shared:/srv/shared
+

@@ -1,0 +1,133 @@
+#FROM php:8-fpm
+FROM php:7.4-fpm
+#FROM php:7.3-fpm
+
+ENV DRUSH_LAUNCHER_VER="0.9.0" \
+    DRUPAL_CONSOLE_LAUNCHER_VER="1.9.7"
+
+#Enable proper composer version (default version 1)
+#ENV COMPOSER_VERSION="1"
+ENV COMPOSER_VERSION="2"
+
+#Prepare environment to install required PHP libraries
+RUN apt-get update -y; \
+    apt install zlib1g-dev libpng-dev -y
+
+
+#Add common applications
+RUN apt-get update -y; \
+  apt-get install -y net-tools \
+            git \
+            unzip \
+            vim \
+            htop \
+            wget \
+            mariadb-client \
+            awscli
+
+# Install composer, drush launcher, drush extensions, drupal console
+#--------------------------------------------------------------------
+RUN set -ex && \
+    cd ~ && \
+    curl -sS https://getcomposer.org/installer -o composer-setup.php && \
+    php composer-setup.php --install-dir=/usr/local/bin --filename=composer --${COMPOSER_VERSION} && \
+    # Drush launcher
+    drush_launcher_url="https://github.com/drush-ops/drush-launcher/releases/download/${DRUSH_LAUNCHER_VER}/drush.phar" && \
+    wget -O drush.phar "${drush_launcher_url}" && \
+    chmod +x drush.phar && \
+    mv drush.phar /usr/local/bin/drush && \
+    # Drush extensions
+    drush_patchfile_url="https://bitbucket.org/davereid/drush-patchfile.git" && \
+    git clone "${drush_patchfile_url}" /root/.drush/drush-patchfile && \
+    drush_rr_url="https://ftp.drupal.org/files/projects/registry_rebuild-7.x-2.5.tar.gz" && \
+    wget -qO- "${drush_rr_url}" | tar zx -C /root/.drush && \
+    # Drupal console
+    console_url="https://github.com/hechoendrupal/drupal-console-launcher/releases/download/${DRUPAL_CONSOLE_LAUNCHER_VER}/drupal.phar" && \
+    curl "${console_url}" -L -o drupal.phar && \
+    mv drupal.phar /usr/local/bin/drupal && \
+    chmod +x /usr/local/bin/drupal && \
+    # Install Redis client
+    cd /tmp && \
+    wget https://github.com/phpredis/phpredis/archive/5.3.2.zip -O phpredis.zip && \
+    unzip -o /tmp/phpredis.zip && mv /tmp/phpredis-* /tmp/phpredis && cd /tmp/phpredis && phpize && ./configure && make && make install && \
+    touch /usr/local/etc/php/conf.d/redis.ini && echo extension=redis.so > /usr/local/etc/php/conf.d/redis.ini
+
+
+#####Prepare PostgreSQL12 client installation
+#####-----------------------------------------
+RUN apt-get update && \
+    apt-get install -y lsb-release gnupg2 wget
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc > /tmp/postgres.pgp
+RUN apt-key add /tmp/postgres.pgp
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" |tee /etc/apt/sources.list.d/pgdg.list
+RUN apt-get update; \
+  apt-get install -y postgresql-client-12 libghc-postgresql-libpq-dev
+
+#Install required libraries for Drupal (gs, pdo, ...)
+RUN docker-php-ext-install gd && \
+    docker-php-ext-install opcache && \
+    docker-php-ext-install pdo_mysql && \
+    docker-php-ext-install pdo_pgsql
+
+##Installing LDAP php module
+#RUN \
+#    apt-get update && \
+#    apt-get install libldap2-dev -y && \
+#    docker-php-ext-configure ldap && \
+#    docker-php-ext-install ldap
+
+# **********************************************************
+# ***** DEVELOPMENT PURPOSES *******************************
+# **********************************************************
+##### Install applications for development purposes
+####RUN apt-get install -y vim \
+####            openssh-server
+####
+####RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
+####    && apt-get install -y apt-utils nodejs
+####
+####RUN npm install --global gulp-cli
+
+# Add certificate for Nginx SSL
+ADD ./ssl/localhost.crt /etc/ssl/localhost.crt
+ADD ./ssl/localhost.key /etc/ssl/localhost.key
+ADD ./ssl/ssl-params.conf /etc/ssl/ssl-params.conf
+
+# Add PHP configuration
+ADD ./php/php.ini /usr/local/etc/php/php.ini
+
+##### Remove all PHP cache system for development purposes
+####RUN { \
+#####    echo 'opcache.memory_consumption=128'; \
+#####    echo 'opcache.interned_strings_buffer=8'; \
+#####    echo 'opcache.max_accelerated_files=4000'; \
+#####    echo 'opcache.revalidate_freq=60'; \
+#####    echo 'opcache.fast_shutdown=1'; \
+####        echo ''; \
+####  } > /usr/local/etc/php/conf.d/opcache-recommended.ini
+####RUN { \
+#####    echo 'opcache.memory_consumption=128'; \
+#####    echo 'opcache.interned_strings_buffer=8'; \
+#####    echo 'opcache.max_accelerated_files=4000'; \
+#####    echo 'opcache.revalidate_freq=60'; \
+#####    echo 'opcache.fast_shutdown=1'; \
+####        echo ''; \
+####  } > /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+
+
+# Install XDebug
+###RUN pecl install xdebug
+
+#### Create user to be available to connect via SSH with the apache group to avoid use root
+RUN useradd docker -m -s /bin/bash \
+  && echo docker:docker | chpasswd
+RUN curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o /home/docker/.git-completion.bash
+ADD php/.bashrc /home/docker/
+ADD php/ssh/id_rsa /home/docker/.ssh/id_rsa
+ADD php/ssh/id_rsa.pub /home/docker/.ssh/id_rsa.pub
+RUN chown -R docker:docker /home/docker/
+RUN chmod 400 /home/docker/.ssh/id_rsa
+
+USER docker
+#Set default directory when access into the container
+WORKDIR /usr/share/nginx/html

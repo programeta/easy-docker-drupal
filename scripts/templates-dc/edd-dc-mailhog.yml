@@ -1,0 +1,8 @@
+  mailhog:
+    image: mailhog/mailhog
+    container_name: "${PROJECT_NAME}_mailhog"
+    networks:
+      - net
+    ports:
+      - "8025:8025"
+

@@ -10,8 +10,8 @@ ENV DRUSH_LAUNCHER_VER="0.9.0" \
     DRUPAL_CONSOLE_LAUNCHER_VER="1.9.7"
 
 #Enable proper composer version (default version 1)
-ENV COMPOSER_VERSION="1"
-#ENV COMPOSER_VERSION="2"
+#ENV COMPOSER_VERSION="1"
+ENV COMPOSER_VERSION="2"
 
 RUN apt-get update -y; \
   apt-get install -y net-tools \
@@ -24,13 +24,13 @@ RUN apt-get update -y; \
 ## UNCOMMENT IF POSTGRES CONTAINER IS ENABLED
 ##------------------------
 ## #Prepare Postgre client installation
-## RUN apt-get update && \
-##     apt-get install -y lsb-release gnupg2 wget
-## RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc > /tmp/postgres.pgp
-## RUN apt-key add /tmp/postgres.pgp
-## RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" |tee /etc/apt/sources.list.d/pgdg.list
-## RUN apt-get update; \
-##   apt-get install -y postgresql-client-12
+RUN apt-get update && \
+    apt-get install -y lsb-release gnupg2 wget
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc > /tmp/postgres.pgp
+RUN apt-key add /tmp/postgres.pgp
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" |tee /etc/apt/sources.list.d/pgdg.list
+RUN apt-get update; \
+  apt-get install -y postgresql-client-12
 ##------------------------
 
 
@@ -80,9 +80,9 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
 RUN npm install --global gulp-cli
 
 # Add certificate for apache SSL
-ADD conf/apache/ssl/localhost.crt /etc/ssl/certs/apache-selfsigned.crt
-ADD conf/apache/ssl/localhost.key /etc/ssl/private/apache-selfsigned.key
-ADD conf/apache/ssl/ssl-params.conf /etc/apache2/conf-available/ssl-params.conf
+ADD ssl/localhost.crt /etc/ssl/certs/apache-selfsigned.crt
+ADD ssl/localhost.key /etc/ssl/private/apache-selfsigned.key
+ADD ssl/ssl-params.conf /etc/apache2/conf-available/ssl-params.conf
 RUN a2enmod ssl
 
 # Remove all PHP cache system for development purposes
@@ -111,17 +111,17 @@ RUN pecl install xdebug
 RUN useradd docker -m -s /bin/bash \
   && echo docker:docker | chpasswd
 RUN curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o /home/docker/.git-completion.bash
-ADD conf/php/.bashrc /home/docker/.bashrc
-ADD conf/php/ssh/id_rsa /home/docker/.ssh/id_rsa
-ADD conf/php/ssh/id_rsa.pub /home/docker/.ssh/id_rsa.pub
+ADD php/.bashrc /home/docker/.bashrc
+ADD ssh/id_rsa /home/docker/.ssh/id_rsa
+ADD ssh/id_rsa.pub /home/docker/.ssh/id_rsa.pub
 RUN chown -R docker:docker /home/docker/
 RUN chmod 400 /home/docker/.ssh/id_rsa
 
 #Change default apache configuration
-ADD conf/php/virtualhost.conf /etc/apache2/sites-enabled/000-default.conf
+ADD apache/virtualhost.conf /etc/apache2/sites-enabled/000-default.conf
 
 # Change PHP configuration
-ADD conf/php/php.ini /usr/local/etc/php/conf.d/php_extended.ini
+ADD php/php.ini /usr/local/etc/php/conf.d/php_extended.ini
 
 #Set default directory when access into the container
 WORKDIR /var/www/html

@@ -2,4 +2,6 @@
 html/*
 !html/READ.me
 .vscode
-
+conf/ssl/
+!conf/ssl/ssl-params.conf
+conf/ssh/
