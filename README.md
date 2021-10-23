@@ -9,23 +9,21 @@ version of Drupal
 * **[Generate dummy certificate for SSL](#generate-dummy-certificate-for-ssl)** -> Steps to generate SSL certificate
 * **[Git user initialize](#git-user-initialize)** -> Initialize Git user in `php` container
 
-# First steps
+# Initial configuration
 1.- To prepare your new local environment you only need to initialize the environment using the sentence
 ```
 sh scripts/initialize.sh
 ```
 This script makes a basic configuration in:
-  * Who containers are named (this ensure that no collision between projects, one project one easy-docker-drupal)
+  * Who containers will be installed
   * Copy your id_rsa and id_rsa.pub into PHP container to use the same SSH Keys in GitLab or GitHub
   * Generate a dummy SSL Certificate to work under https in this environment
   * Make changes in your VirtualHost where:
     * ServerName will be the name that you entered, for example, mi-first-environment.vm
     * DocumentRoot is established to respond in path '/var/www/html/mi-first-environment/web'
+  * Launch automatic building
 
-2.- Once initialized the environment you will able to start environment using sentence
-```
-docker-compose up -d --build
-```
+
 3.- Go into PHP container (as root)
 ```
 docker-compose exec php bash
@@ -40,11 +38,30 @@ This environment configure a default database called `drupal` with user `root` a
 
 ## Configure your project in Apache
 By default the VirtualHost has been configured using the script `initialize.sh`, you can modify
-the file "conf/php/virtualhost.conf" if you need some extra configuration to perform your website.
+the file "conf/apache/virtualhost.conf" if you need some extra configuration to perform your website.
 The VirtualHost based in port 80 is used to force a redirection to 443 port, avoiding the use
 of insecure pages.
 You can add more than one VirtualHost to make this environment multipurpose for more than
 one Drupal project.
+
+IMPORTANT: Every change made must be preceeded of this sentence to rebuild environment
+```
+docker-compose up -d --build
+```
+
+## Configure your project in Nginx
+By default the VirtualHost has been configured using the script `initialize.sh`, you can modify
+the file "conf/nginx/nginx.d/default.conf" if you need some extra configuration to perform your website.
+The VirtualHost based in port 80 is used to force a redirection to 443 port, avoiding the use
+of insecure pages.
+You can add more than one VirtualHost to make this environment multipurpose for more than
+one Drupal project.
+Default configuration is provided to work with drupal 9.
+
+IMPORTANT: Every change made must be preceeded of this sentence to restart container
+```
+docker-compose restart nginx
+```
 
 ## Modify your "hosts" file
 Is very important that your file "/etc/hosts" or "c:\windows\drivers\etc\hosts" will be modified
@@ -61,8 +78,14 @@ can connect from your Windows machine through port 3306 with credentials defined
 ### Starting a existing Database
 See https://hub.docker.com/_/mariadb for more detailed information
 
-## Service "php"
-This container is the most important that have configured an Apache Server and PHP 7.3 working as "module" not as "PHP-FPM".
+## Service "Postgres"
+Contain environment to load a postgres database, which have the database stored in a persistent volume /var/lib/postgresql/data.
+Internally have open the port 5432 to be available connected for rest of containers as "postgres" host. Optionally you
+can connect from your Windows machine through port 5432 with credentials defined in `.env` file.
+
+## Service "php" (for Apache)
+This container is the most important that have configured an Apache Server and PHP8 working as "module" not as "PHP-FPM".
+Have preinstalled "composer" in version 2.
 
 See https://hub.docker.com/_/drupal for more detailed information
 
@@ -73,12 +96,12 @@ By defailt this container expose to host two ports:
 
 By default a dummy certificate is created when you launch the `inicialize.sh` script. All request in port 80 will be
 redirected to port 443.
-You are able to add more projects by creating the VirtualHost  entry in the file `conf/php/virtualhost.conf`
+You are able to add more projects by creating the VirtualHost  entry in the file `conf/apache/virtualhost.conf`
 
 ### Where drupal is stored
 Drupal will be stored in `html` folder, here you must deploy your project and configure it in the VirtualHost setting the correct DocumentRoot path
 
-### Modifiyng the default php.ini values
+### Modifiyng the default php.ini values (for Apache)
 You are able to change the default php.ini values, to do that you need to modify the file `conf/php/php.ini` and modify all
 necessary variables. By default some changes have been implemented to make easy the development:
 * Max execution time -> Increased from 30 to 60 seconds
@@ -87,24 +110,35 @@ necessary variables. By default some changes have been implemented to make easy 
 
 If you need enable the XDebug, you need uncomment the lines commented in the php.ini file
 
+IMPORTANT: Every change made must be preceeded of this sentence to rebuild environment
+```
+docker-compose up -d --build
+```
+
 ### Support git autocompletion
 This version support git autocompletion
 
-### Accessing into container
+### Accessing into container (for Apache)
 To access into container, once the docker-compose is executed, you must launch the sentence:
 ```
 docker-compose exec -u docker php bash
 ```
 
-### Default PHP version and how to change
-By default this container runs with PHP 7.4, in case that you need downgrade this version you need change in the `Dockerfile-drupal` the
+### Accessing into container (for Nginx)
+To access into container, once the docker-compose is executed, you must launch the sentence:
+```
+docker-compose exec php bash
+```
+
+### Default PHP version and how to change (for Apache instance)
+By default this container runs with PHP8, in case that you need downgrade this version you need change in the `conf/Dockerfile-php-apache` the
 first line:
 ```
 FROM drupal:9-apache
 ```
 For this other:
 ```
-FROM drupal:7-apache
+FROM drupal:8-apache
 ```
 Once this lines have been changed you need rebuild the project to take effect the changes.
 ```
@@ -124,6 +158,8 @@ When a variable is exposed in the docker-compose.yml file you nedd retrieve her 
   );
 ```
 
+## Service "PHP" (for nginx)
+TODO
 
 
 ## Service "mailhog"
