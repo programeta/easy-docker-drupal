@@ -11,7 +11,7 @@ ENV COMPOSER_VERSION="2"
 
 #Prepare environment to install required PHP libraries
 RUN apt-get update -y; \
-    apt install zlib1g-dev libpng-dev -y
+    apt install zlib1g-dev libpng-dev libwebp-dev libjpeg-dev -y
 
 
 #Add common applications
@@ -64,10 +64,11 @@ RUN apt-get update; \
   apt-get install -y postgresql-client-12 libghc-postgresql-libpq-dev
 
 #Install required libraries for Drupal (gs, pdo, ...)
-RUN docker-php-ext-install gd && \
-    docker-php-ext-install opcache && \
+RUN docker-php-ext-install opcache && \
     docker-php-ext-install pdo_mysql && \
-    docker-php-ext-install pdo_pgsql
+    docker-php-ext-install pdo_pgsql && \
+    docker-php-ext-configure gd --with-webp --with-jpeg && \
+    docker-php-ext-install gd
 
 ##Installing LDAP php module
 #RUN \
