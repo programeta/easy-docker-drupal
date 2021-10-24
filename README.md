@@ -4,9 +4,9 @@ EDD is a tool based on docker to help drupal developers to generate easily the n
 
 This README.md contains:
 
-* **[Starting with EDD](#starting-edd)** Starting with EDD
+* **[Starting with EDD](#starting-with-edd)** Starting with EDD
 * **[Containers maintenance](#containers-maintenance)** Containers maintenance
-* **[Tips to perform functionality](#tips)** Tips to perform functionality
+* **[Tips to perform functionality](#tips-to-perform-functionality)** Tips to perform functionality
 
 ## Starting with EDD
 
