@@ -32,6 +32,7 @@
       #Configuration
       - ./conf/nginx/nginx.d/:/etc/nginx/conf.d/
       - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./php/php.ini:/usr/local/etc/php/php.ini
       #SSL Support
       - ./conf/ssl/localhost.crt:/etc/ssl/localhost.crt
       - ./conf/ssl/localhost.key:/etc/ssl/localhost.key

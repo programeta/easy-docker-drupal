@@ -1,153 +1,184 @@
-# What contains this README file
-This file contain next sections:
-* **[First steps](#first-steps)** -> Explain how to change the downloaded project to the final Git repository and how deploy your first
-version of Drupal
-* **[Containers definition](#containers-definition)** -> Explain all containers that have been used to work in your local environment
-* **[Debug your code](#debug-your-code)** -> Explain how configure the environment and your IDE to debug your code remotely
-* **[Which have this repository](#which-have-this-repository)** -> Explain the files in this repository
-* **[Generate id_rsa and id_rsa.pub](#generate-id_rsa-and-id_rsapub)** -> Steps to generate keygen files
-* **[Generate dummy certificate for SSL](#generate-dummy-certificate-for-ssl)** -> Steps to generate SSL certificate
-* **[Git user initialize](#git-user-initialize)** -> Initialize Git user in `php` container
+# Easy Docker Drupal (EDD)
 
-# Initial configuration
-1.- To prepare your new local environment you only need to initialize the environment using the sentence
-```
-sh scripts/initialize.sh
-```
-This script makes a basic configuration in:
-  * Who containers will be installed
-  * Copy your id_rsa and id_rsa.pub into PHP container to use the same SSH Keys in GitLab or GitHub
-  * Generate a dummy SSL Certificate to work under https in this environment
-  * Make changes in your VirtualHost where:
-    * ServerName will be the name that you entered, for example, mi-first-environment.vm
-    * DocumentRoot is established to respond in path '/var/www/html/mi-first-environment/web'
-  * Launch automatic building
+EDD is a tool based on docker to help drupal developers to generate easily the neccessary structure to allocate their Drupal projects.
 
+This README.md contains:
 
-3.- Go into PHP container (as root)
-```
-docker-compose exec php bash
+* **[Starting with EDD](#starting-edd)** Starting with EDD
+* **[Containers maintenance](#containers-maintenance)** Containers maintenance
+* **[Tips to perform functionality](#tips)** Tips to perform functionality
+
+## Starting with EDD
+
+Once EDD is downloaded you need initialize the environment with
+
+```bash
+bash scripts/initialize.sh
 ```
 
-Additionally this container have an other user to work with no root privileges, just adding `-u docker`:
-```
-docker-compose exec -u docker php bash
+This sentence ask some questions to create a basic structure based on your preferences:
+
+* Machine name: this is a prefix added for containers to this project
+* Database storage: MariaDB or Postgres
+* Web server engine: Apache or Nginx
+* Search engine: Solr or Elastic
+* Mailhog: Enable or disable this container
+* Redis: Enable or disable this container
+* Launch docker: Launch automatically sentences to generate enviornment with selected values
+
+This script will prepare your environment to run your first application preparing:
+
+* URL Domain: "https://&lt;Machine name&gt;.vm/"
+* DocumentRoot:
+
+You will need modify your host file (/etc/hosts or c:\windows\system32\drivers\etc\host) to tell your SO where is located your new project, for example:
+
+```text
+127.0.0.1 <Machine name>.vm
 ```
 
-This environment configure a default database called `drupal` with user `root` and password `root`
+## Containers maintenance
 
-## Configure your project in Apache
-By default the VirtualHost has been configured using the script `initialize.sh`, you can modify
-the file "conf/apache/virtualhost.conf" if you need some extra configuration to perform your website.
-The VirtualHost based in port 80 is used to force a redirection to 443 port, avoiding the use
-of insecure pages.
-You can add more than one VirtualHost to make this environment multipurpose for more than
-one Drupal project.
+You can easily manage all containers configuring and adapting their inside applications:
 
-IMPORTANT: Every change made must be preceeded of this sentence to rebuild environment
+* **[Apache container](#apache-container)** Apache container
+* **[Nginx container](#nginx-container)** Nginx container
+* **[PHP container](#php-container)** PHP container (for nginx configuration)
+* **[MySQL container](#mysql-container)** MySQL container
+* **[Postgres container](#postgres-container)** Postgres container
+* **[Solr container](#solr-container)** Solr container
+* **[Elastic search container](#elastic-container)** Elastic search container
+* **[Mailhog container](#mailhog-container)** Mailhog container
+* **[Redis container](#redis-container)** Redis container
+
+### Apache container
+
+This container is based on https://hub.docker.com/_/drupal using by default `drupal:9-apache` image.
+
+Extend configuration adding some tools such us:
+
+* Create new "docker" user, to avoid use of root in develop environment
+* Add tools `composer`, `drush launcher`, `drush extensions`, `drupal console`
+* Add dummy certificate to support HTTPS
+* Disable OPCache
+* MariaDB client and Postgres client
+
+This container expose 80 and 443 ports. All traffic is redirected to 443 port. "https://&lt;Machine name&gt;.vm/"
+
+#### Configuration files
+
+Exists several files where you can adapt/manage the configuration for this container:
+
+* VirtualHost management: located in `conf/apache/virtualhost.conf`. You can add/modify several virtualhost as you need.
+* PHP Configuration: located in `conf/php/php.ini`. You can adapt PHP configuration adding whatever PHP config parameters
+
+Once this files are modified, you'll need restart the apache container
+
+```bash
+docker-compose restart apache
 ```
-docker-compose up -d --build
-```
 
-## Configure your project in Nginx
-By default the VirtualHost has been configured using the script `initialize.sh`, you can modify
-the file "conf/nginx/nginx.d/default.conf" if you need some extra configuration to perform your website.
-The VirtualHost based in port 80 is used to force a redirection to 443 port, avoiding the use
-of insecure pages.
-You can add more than one VirtualHost to make this environment multipurpose for more than
-one Drupal project.
-Default configuration is provided to work with drupal 9.
+### Nginx container
 
-IMPORTANT: Every change made must be preceeded of this sentence to restart container
-```
+This container is based on https://hub.docker.com/_/nginx using by default `nginx:1-alpine` image.
+
+This container expose 80 and 443 ports. All traffic is redirected to 443 port.
+
+#### Configuration files
+
+Exists several files where you can adapt/manage the configuration for this container:
+
+* Servers management: located in `conf/nginx/nginx.d/default.conf`. You can add/modify several servers as you need.
+
+Once this file is modified, you'll need restart the nginx container
+
+```bash
 docker-compose restart nginx
 ```
 
-## Modify your "hosts" file
-Is very important that your file "/etc/hosts" or "c:\windows\drivers\etc\hosts" will be modified
-to add a resolution for `ServerName` defined in your `VirtualHost` configuration.
+### PHP container
 
-# Containers definition:
-This local environment have some containers (services) that allow developers work with one or more drupal instances.
+This container is based on https://hub.docker.com/_/php using by default `php:8-fpm` image.
 
-## Service "mariadb"
-Contain environment to load a mariadb database, which have the database stored in a persistent volume /var/lib/mysql.
-Internally have open the port 3306 to be available connected for rest of containers as "mariadb" host. Optionally you
-can connect from your Windows machine through port 3306 with credentials defined in `.env` file.
+Extend configuration adding some tools such us:
 
-### Starting a existing Database
-See https://hub.docker.com/_/mariadb for more detailed information
+* Add tools `composer`, `drush launcher`, `drush extensions`, `drupal console`
+* Add dummy certificate to support HTTPS
+* Disable OPCache
+* MariaDB client and Postgres client
+* Extend use of GD images to manage: jpeg, png and webp
 
-## Service "Postgres"
-Contain environment to load a postgres database, which have the database stored in a persistent volume /var/lib/postgresql/data.
-Internally have open the port 5432 to be available connected for rest of containers as "postgres" host. Optionally you
-can connect from your Windows machine through port 5432 with credentials defined in `.env` file.
+#### Configuration files
 
-## Service "php" (for Apache)
-This container is the most important that have configured an Apache Server and PHP8 working as "module" not as "PHP-FPM".
-Have preinstalled "composer" in version 2.
+Exists several files where you can adapt/manage the configuration for this container:
 
-See https://hub.docker.com/_/drupal for more detailed information
+* PHP Configuration: located in `conf/php/php.ini`. You can adapt PHP configuration adding whatever PHP config parameters
 
-### Available ports
-By defailt this container expose to host two ports:
-* 80    -> Apache HTTP request
-* 443   -> Apache HTTPS request
+Once this file is modified, you'll need restart the php container
 
-By default a dummy certificate is created when you launch the `inicialize.sh` script. All request in port 80 will be
-redirected to port 443.
-You are able to add more projects by creating the VirtualHost  entry in the file `conf/apache/virtualhost.conf`
-
-### Where drupal is stored
-Drupal will be stored in `html` folder, here you must deploy your project and configure it in the VirtualHost setting the correct DocumentRoot path
-
-### Modifiyng the default php.ini values (for Apache)
-You are able to change the default php.ini values, to do that you need to modify the file `conf/php/php.ini` and modify all
-necessary variables. By default some changes have been implemented to make easy the development:
-* Max execution time -> Increased from 30 to 60 seconds
-* Memory limit -> Increased from 128M to 256M
-* Max upload files -> Increased from 2M to 32M (here you must change the `post_max_size` and `upload_max_filesize` variables)
-
-If you need enable the XDebug, you need uncomment the lines commented in the php.ini file
-
-IMPORTANT: Every change made must be preceeded of this sentence to rebuild environment
-```
-docker-compose up -d --build
+```bash
+docker-compose restart php
 ```
 
-### Support git autocompletion
-This version support git autocompletion
+### MySQL container
 
-### Accessing into container (for Apache)
-To access into container, once the docker-compose is executed, you must launch the sentence:
-```
-docker-compose exec -u docker php bash
-```
+This container is based on https://hub.docker.com/_/mariadb using by default `mariadb:10.5` image.
 
-### Accessing into container (for Nginx)
-To access into container, once the docker-compose is executed, you must launch the sentence:
-```
-docker-compose exec php bash
-```
+Please follow instructions in https://hub.docker.com/_/mariadb to manage environment variables if needed.
 
-### Default PHP version and how to change (for Apache instance)
-By default this container runs with PHP8, in case that you need downgrade this version you need change in the `conf/Dockerfile-php-apache` the
-first line:
-```
-FROM drupal:9-apache
-```
-For this other:
-```
-FROM drupal:8-apache
-```
-Once this lines have been changed you need rebuild the project to take effect the changes.
-```
-docker-compose up -d --build
-```
+By default we set `root` password as `root`.
 
-### Gettings variables in PHP exposed by docker-compose
-When a variable is exposed in the docker-compose.yml file you nedd retrieve her information like this example:
-```
+This container expose 3306 port.
+
+### Postgres container
+
+This container is based on https://hub.docker.com/_/postgres using by default `postgres:12` image.
+
+Please follow instructions in https://hub.docker.com/_/postgres to manage environment variables if needed.
+
+By default we set password as `root`.
+
+This container expose 5432 port.
+
+### Solr container
+
+This container is based on https://hub.docker.com/_/solr using by default `solr:8` image.
+
+This container expose 8983 port. "http://&lt;Machine name&gt;.vm:8983"
+
+### Elastic search container
+
+This container is based on https://hub.docker.com/_/elasticsearch using by default `elasticsearch:7.10.1` image.
+
+This container expose 9200 and 9300 ports.
+
+### Mailhog container
+
+This container is based on https://hub.docker.com/r/mailhog/mailhog/ using by default `mailhog/mailhog` image.
+
+This container expose 8025 port. "http://&lt;Machine name&gt;.vm:8025"
+
+
+### Redis container
+
+This container is based on https://hub.docker.com/_/redis using by default `redis:5-alpine` image.
+
+## Tips to perform functionality
+
+In this part we will see hoy to enable some tools that containers offer by default and debugging.
+
+* **[Use of environment variables in your project](#environment-variables)** Use of environment variables in your project
+* **[Debug your code with Visual Studio Code](#debugging)** Debug your code with Visual Studio Code
+
+### Use of environment variables in your project
+
+By default, all containers have availability to retrieve several variables from a global file called `.env` that you can find in this folder.
+
+This allow to you send information to containers, and is recommended their use to work with best practices in abstraction application.
+
+For example, to isolate your settings configuration from the infrastructure you can modify your database connection in your drupal settings.php file:
+
+```text
   $databases['default']['default'] = array (
     'database' => getenv('MYSQL_DATABASE'),
     'username' => getenv('MYSQL_DATABASE_USER'),
@@ -158,64 +189,27 @@ When a variable is exposed in the docker-compose.yml file you nedd retrieve her 
   );
 ```
 
-## Service "PHP" (for nginx)
-TODO
+Or adding, for example, the trusted hosts in environment variables:
 
-
-## Service "mailhog"
-This service allow send *dummy* emails to log all of them and see the final results.
-
-You must connect your Drupal instance using SMTP and mimemail modules with next parameters:
-* Go to the SMTP administration page: /admin/config/system/smtp and set this variables
-  * SMTP: mailhog
-  * Port: 1025
-* Go to the MimeMail page: /admin/config/system/mimemail and set this variables
-  * Formatter: Mime Mail Mailer
-  * Sender: SMTP Mailer
-
-With this information your system is available to *emulate* to send emails (in HTML format) and the results you can see in http://localhost:8025
-
-### Available ports
-By defailt this container expose to host one port:
-* 8025 -> Mailhog
-
-## Service "redis"
-This service is a cache for Drupal. You will need install the module `redis` (all dependencies are built in the container).
-* Installing using composer -> `composer require drupal/redis`
-* Enable the module -> `drush en redis`
-
-Once the module is enabled, you can add the next information in your `settings.php` file:
+```text
+  $settings['trusted_host_patterns'] = explode(',', DRUPAL_THUSTED_HOST);
 ```
-$settings['redis.connection']['interface'] = 'PhpRedis'; // Can be "Predis".
-$settings['redis.connection']['host']      = 'redis';  // Your Redis instance hostname.
-$settings['cache']['default'] = 'cache.backend.redis';
-```
-The PHP container (or service) is configured with all libraries to use PHPRedis.
 
-The system automatically connect with Redis. You can see in `Status report` if the module works properly.
+IMPORTANT: Once file `.env` is modified you will need restart your containers.
 
-## Service "solr"
-This service allows index all content using Apache Solr. You will need install the module `Search API Solr`.
+### Debug your code with Visual Studio Code
 
-By default this service create a core called `drupalsolr`.
-
-You need follow the instructions detailed in the README.md file downloaded in the module `search_apoi_solr` to configure
-properly the connection.
-
-### Available ports
-By defailt this container expose to host one port:
-* 8983 -> Apache Solr request
-
-# DEBUG your code:
 This section is explained to work with Visual Studio Code...
-* Go to: conf/php/php.ini and uncomment the last lines in the file (recreate the docker images to enable it)
+
+* Go to: `conf/php/php.ini` and uncomment the last lines in the file (recreate the docker images to enable it)
 * Install all extensions for Drupal 8 or 7 in your VSC editor: https://www.drupal.org/docs/develop/development-tools/configuring-visual-studio-code
 * Install Extension in your navigator:
   * Firefox: https://addons.mozilla.org/en-GB/firefox/addon/xdebug-helper-for-firefox/
   * Chrome: https://chrome.google.com/extensions/detail/eadndfjplgieldjbigjakmdgkmoaaaoc
 * Enable the debug in the navigator
 * Configure launch.json (CTRL+SHIFT+D -> Add Configuration) and replace all content with this lines:
-```
+
+```text
         {
             // Use IntelliSense to learn about possible attributes.
             // Hover to view descriptions of existing attributes.
@@ -242,49 +236,5 @@ This section is explained to work with Visual Studio Code...
             ]
         }
 ```
+
 * Once your definition is finished you can go to the "Debug" section pressing `F5` and select the option that you want to debug (PHP or JavaScript)
-
-
-# Which have this repository
-This repository contains files and folders to start quickly to deploy a new drupal instance:
-
-* `.env` file -> Contains vairables definitions to connect to Drupal, project name, ... You can add all variables that you need to configure
-your environment. Please take account that if you want see all these variables in your container you must add this in `docker-compose.yml` file
-* `docker-compose.yml` file -> Contain the definition of all containers needed to work in your local environment
-* `conf` folder -> Have some configurations, mainly PHP and VirtualHost configurations
-* `html` folder -> Folder to store your projects.
-* `Dockerfile-drupal` file -> Contain all needed configuration for PHP container to establish the envirnoment to work with Drupal
-(PHP Modules, applications such us `vim`, SSH Server, ...). This image have been extended from a Docker image [Drupal 8](https://hub.docker.com/_/drupal/). Please referer to Docker image to see all available options.
-* `README.md` file -> This file
-
-
-# Generate id_rsa and id_rsa.pub
-This step explain how to generate the files id_rsa and id_rsa.pub based on linux.
-
-You must launch in your host the next sentence:
-```
-ssh-keygen -f conf/php/ssh/id_rsa -N ""
-```
-This files could be used to connect automatically with any Git without password, you must add the SSH-KEY `conf/php/ssh/id_rsa.pub` in
-the repository to avoid question for user and password...
-
-In case that you are working on linux, you can copy your id_rsa and id_rsa.pub from your .ssh folder
-```
-cp ~/.ssh/id_rsa conf/php/ssh/id_rsa
-cp ~/.ssh/id_rsa.pub conf/php/ssh/id_rsa.pub
-```
-
-# Generate dummy certificate for SSL
-We assume that you are located in the docroot of this document to launch this sentence:
-```
-openssl req -x509 -nodes -days 2048 -newkey rsa:2048 -keyout conf/apache/ssl/localhost.key -out conf/apache/ssl/localhost.crt
-```
-NOTE: This step is not necessary if you are using the image "programeta/drupal-php". This image have already a dummy SSL certificate
-
-
-
-# Git user initialize
-If you need use Git inside container, you must fill the file `conf/php/git_user_initialize.sh`
-
-This file must be launched every time that the container `php` is created to stablish the proper values to connect with Git. With this
-option you will be avoid the error message when you prepare a commit.

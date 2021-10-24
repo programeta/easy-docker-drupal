@@ -11,8 +11,10 @@
     networks:
       - net
     volumes:
-      #Configuration for Apache SSL and Key for user docker to connect with Git or other resources
+      #Configuration for Apache and html folder to share projects
       - ./conf/php/git_user_initialize.sh:/home/docker/git_user_initialize.sh
+      - ./conf/apache/virtualhost.conf:/etc/apache2/sites-enabled/000-default.conf
+      - ./conf/php/php.ini:/usr/local/etc/php/conf.d/php_extended.ini
       - ./logs:/var/log/apache2/docker
       - ./html:/var/www/html:delegated
       - ./shared:/srv/shared

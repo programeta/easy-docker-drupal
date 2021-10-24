@@ -71,8 +71,7 @@ RUN set -ex && \
 # ***** DEVELOPMENT PURPOSES *******************************
 # **********************************************************
 # Install applications for development purposes
-RUN apt-get install -y vim \
-            openssh-server
+RUN apt-get install -y vim
 
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
     && apt-get install -y apt-utils nodejs
@@ -116,12 +115,6 @@ ADD ssh/id_rsa /home/docker/.ssh/id_rsa
 ADD ssh/id_rsa.pub /home/docker/.ssh/id_rsa.pub
 RUN chown -R docker:docker /home/docker/
 RUN chmod 400 /home/docker/.ssh/id_rsa
-
-#Change default apache configuration
-ADD apache/virtualhost.conf /etc/apache2/sites-enabled/000-default.conf
-
-# Change PHP configuration
-ADD php/php.ini /usr/local/etc/php/conf.d/php_extended.ini
 
 #Set default directory when access into the container
 WORKDIR /var/www/html
