@@ -73,10 +73,10 @@ RUN set -ex && \
 # Install applications for development purposes
 RUN apt-get install -y vim
 
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
-    && apt-get install -y apt-utils nodejs
+#RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
+#    && apt-get install -y apt-utils nodejs
 
-RUN npm install --global gulp-cli
+#RUN npm install --global gulp-cli
 
 # Add certificate for apache SSL
 ADD ssl/localhost.crt /etc/ssl/certs/apache-selfsigned.crt
