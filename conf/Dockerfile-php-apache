@@ -1,10 +1,11 @@
 #Prepare initial instance for an official image of Drupal based on Docker Hub
 #https://hub.docker.com/_/drupal/
 #
+# To work with PHP8.1 set "FROM drupal:rc-apache-buster"
 # To work with PHP8.0 set "FROM drupal:9-apache"
 # To work with PHP7.4 set "FROM drupal:8-apache"
 #
-FROM drupal:9-apache
+FROM drupal:rc-apache-buster
 
 ENV DRUSH_LAUNCHER_VER="0.10.1" \
     DRUPAL_CONSOLE_LAUNCHER_VER="1.9.7"
@@ -19,18 +20,18 @@ RUN apt-get update -y; \
             unzip \
             wget \
             mariadb-client \
-            awscli
+            vim
 
 ## UNCOMMENT IF POSTGRES CONTAINER IS ENABLED
 ##------------------------
 ## #Prepare Postgre client installation
-RUN apt-get update && \
-    apt-get install -y lsb-release gnupg2 wget
-RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc > /tmp/postgres.pgp
-RUN apt-key add /tmp/postgres.pgp
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" |tee /etc/apt/sources.list.d/pgdg.list
-RUN apt-get update; \
-  apt-get install -y postgresql-client-12
+# RUN apt-get update && \
+#     apt-get install -y lsb-release gnupg2 wget
+# RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc > /tmp/postgres.pgp
+# RUN apt-key add /tmp/postgres.pgp
+# RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" |tee /etc/apt/sources.list.d/pgdg.list
+# RUN apt-get update; \
+#   apt-get install -y postgresql-client-12
 ##------------------------
 
 
@@ -53,10 +54,10 @@ RUN set -ex && \
     console_url="https://github.com/hechoendrupal/drupal-console-launcher/releases/download/${DRUPAL_CONSOLE_LAUNCHER_VER}/drupal.phar" && \
     curl "${console_url}" -L -o drupal.phar && \
     mv drupal.phar /usr/local/bin/drupal && \
-    chmod +x /usr/local/bin/drupal && \
+    chmod +x /usr/local/bin/drupal
     # Install Redis client
-    cd /tmp && \
-    wget https://github.com/phpredis/phpredis/archive/5.3.2.zip -O phpredis.zip && \
+RUN cd /tmp && \
+    wget https://github.com/phpredis/phpredis/archive/5.3.7.zip -O phpredis.zip && \
     unzip -o /tmp/phpredis.zip && mv /tmp/phpredis-* /tmp/phpredis && cd /tmp/phpredis && phpize && ./configure && make && make install && \
     touch /usr/local/etc/php/conf.d/redis.ini && echo extension=redis.so > /usr/local/etc/php/conf.d/redis.ini
 
@@ -70,9 +71,6 @@ RUN set -ex && \
 # **********************************************************
 # ***** DEVELOPMENT PURPOSES *******************************
 # **********************************************************
-# Install applications for development purposes
-RUN apt-get install -y vim
-
 #RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
 #    && apt-get install -y apt-utils nodejs
 
@@ -104,7 +102,7 @@ RUN { \
 
 
 # Install XDebug
-RUN pecl install xdebug
+#RUN pecl install xdebug
 
 # Create user to be available to connect via SSH with the apache group to avoid use root
 RUN useradd docker -m -s /bin/bash \
@@ -113,8 +111,11 @@ RUN curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git
 ADD php/.bashrc /home/docker/.bashrc
 ADD ssh/id_rsa /home/docker/.ssh/id_rsa
 ADD ssh/id_rsa.pub /home/docker/.ssh/id_rsa.pub
-RUN chown -R docker:docker /home/docker/
-RUN chmod 400 /home/docker/.ssh/id_rsa
+RUN chown -R docker:docker /home/docker/ && \
+    chmod 400 /home/docker/.ssh/id_rsa && \
+    chown -R docker:root /etc/ssl/private/  && \
+    sed -i 's/www-data:x:33:/www-data:x:33:docker/g' /etc/group
 
 #Set default directory when access into the container
 WORKDIR /var/www/html
+USER docker
