@@ -1,4 +1,10 @@
 #!/bin/bash
+
+if [ ! "$BASH_VERSION" ] ; then
+    echo "Please do not use 'sh' to run this script ($0), just execute it directly" 1>&2
+    exit 1
+fi
+
 NC='\033[0m' # No Color
 RED='\033[1;31m'
 GREEN='\033[1;32m'
@@ -106,7 +112,7 @@ else
 fi
 printf "\n"
 
-if [ ${MAILHOG_ENGINE} == 'yes' ]
+if [ ${LAUNCH_DOCKER} == 'yes' ]
 then
   printf "${GREEN}Launch environment...${NC}\n"
   docker-compose up -d --build
