@@ -65,7 +65,6 @@ RUN set -ex && \
 #Install required libraries for Drupal (gs, pdo, ...)
 RUN docker-php-ext-install opcache && \
     docker-php-ext-install pdo_mysql && \
-    docker-php-ext-install pdo_pgsql && \
     docker-php-ext-configure gd --with-webp --with-jpeg && \
     docker-php-ext-install gd
 
