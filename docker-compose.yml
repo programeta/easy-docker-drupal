@@ -6,6 +6,7 @@ volumes:
   solr-data:
   postgres-data:
   elastic-data:
+  pgadmin-data:
 
 networks:
   net:

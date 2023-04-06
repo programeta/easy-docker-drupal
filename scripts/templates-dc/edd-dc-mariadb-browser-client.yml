@@ -1,0 +1,11 @@
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8000:80
+    environment:
+      - PMA_HOST=${MYSQL_DATABASE_HOST}
+      - PMA_USER=${MYSQL_DATABASE_USER}
+      - PMA_PASSWORD=${MYSQL_DATABASE_PASS}
+    networks:
+      - net

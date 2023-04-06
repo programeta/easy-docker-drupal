@@ -25,6 +25,9 @@ printf "Please, select database storage (mariadb/postgres) [mariadb]: "
 read input_db
 DATABASE_ENGINE=${input_db:=mariadb}
 
+printf "Do you want to include a database browser client? (phpmyadmin or phpgpadmin by port 8000) [yes]: "
+read input_dbbrw
+DATABASE_BRW_CLIENT=${input_dbbrw:=yes}
 
 printf "Please, select webserver engine (apache/nginx) [apache]: "
 read input_ws
@@ -38,7 +41,6 @@ printf "Mailhog enabled (yes/no) [yes]: "
 read input_mh
 MAILHOG_ENGINE=${input_mh:=yes}
 
-
 printf "Redis enabled (yes/no) [yes]: "
 read input_rd
 REDIS_ENGINE=${input_rd:=yes}
@@ -47,11 +49,15 @@ printf "Launch docker (yes/no) [yes]: "
 read input_ld
 LAUNCH_DOCKER=${input_ld:=yes}
 
-
 cat scripts/templates-dc/edd-dc.yml > docker-compose.yml
 cat scripts/templates-dc/edd-dc-${DATABASE_ENGINE}.yml >> docker-compose.yml
 cat scripts/templates-dc/edd-dc-${WEBSERVER_ENGINE}.yml >> docker-compose.yml
 cat scripts/templates-dc/edd-dc-${SEARCH_ENGINE}.yml >> docker-compose.yml
+
+if [ ${DATABASE_BRW_CLIENT} == 'yes' ]
+then
+  cat scripts/templates-dc/edd-dc-${DATABASE_ENGINE}-browser-client.yml >> docker-compose.yml
+fi
 
 if [ ${MAILHOG_ENGINE} == 'yes' ]
 then
